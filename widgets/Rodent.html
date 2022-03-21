@@ -873,11 +873,20 @@
     .normalCardBorder {
     background-color: #e6e6e6ff;
     }
+    .normalCardBorder {
+    background-color: #e6e6e6ff;
+    }
+    .whiteBackgroundCard {
+        background-color: #f2f2f2 !important
+    }
 
-    .normalCardBorder:hover {
+    .normalCardBorder:not(.disableHover):hover {
         background-color: #f2f2f2
     }
 
+    .normalCardBorder.disableHover {
+        background-color: #a8a8a8
+    }
 
     [data-info="chart"] {
     padding: 20px;
@@ -1673,6 +1682,14 @@
         margin-top:2px;
         font-size: 14px;
      }
+    .rotate {
+        transform: rotate(180deg);
+    }
+    .hoursLabel {
+        text-align: center;
+        color: white;
+        margin-top: 4px;
+    }
     </style>
 </head>
 <body id="body">
@@ -2430,7 +2447,7 @@
                 <div data-section="cell">
                     <div>
                         <div class="container flex" style="margin: 8px 8px 4px 0; ">
-                            <div class="col-left" style="border-right: 0.98px solid #9b9b9bff;width:100%;">
+                            <div class="col-left" style="border-right: 0.98px solid #9b9b9bff;width:42%;">
                                 <div class="iconWidth PositionIcon">
                                     <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg29831" version="1.1" viewBox="0 0 16.933333 16.933333" height="36" width="36">
                                         <g id="g8856" transform="matrix(1.0393596,0,0,1.0918312,-144.64395,-96.576359)">
@@ -2460,7 +2477,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div style="float: right; margin-right: -12px; display: flex; width:100%;">
+                            <div style="float: right; margin-right: -12px; display: flex; width:62%;">
 
                                 <div class="displayContainer" style=" text-align: center;margin-left: 10px; width:100%;">
                                     <span class="ValueStyle" data-value="Urgent">
@@ -2491,9 +2508,252 @@
                                     </div>
                                     <span class="LabelStyle" data-info="lbl3">NO ACTIVITY</span>
                                 </div>
+                                
+                                <div class="displayContainer toggleSiteClearScreen" onclick="toggleSiteClearScreen(event)" style="text-align: center;width:100%; display: flex; justify-content: center; align-items: center;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#41505aff" class="bi bi-chevron-double-down" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                        <path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                    </svg>
+                                </div>
 
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+                
+                <div data-section="siteClearScreen" onclick="event.stopPropagation()" style="width:100%;background-color: #41505aff;border: 1px solid #bfbfbf; overflow: hidden; display: none;">
+                    <div data-section="alert" style="display: none; flex-direction: column; justify-content:space-evenly; text-align: center; margin-bottom: 4px;">
+                        <div data-value="alert">
+                        </div>
+                        <hr style="margin: 8px;" />
+                    </div>
+                    <div data-section="Actions">
+                        <div data-section="SmartDevice">
+                            <div class="row" onclick="event.stopPropagation()">
+                                <div class="container-fluid" data-info="btnSmart">
+                                    <div class="row flex flexItemHolder">
+                                        <div class="flexItem">
+                                            <svg xmlns="http://www.w3.org/2000/svg" onclick="AddSiteBait(event)" data-info="baitIcon" width="16" height="16" fill="currentColor" class="bi bi-plus-circle iconGrid" viewBox="0 0 16 16">
+                                                <path fill="#4d98c2ff" d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                                <path fill="#4d98c2ff" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                                            </svg>
+                                            <p style="color:#4d98c2ff" data-info="baitText" class="fixMargin">ADD BAIT</p>
+                                            <!--<a href="#" class="selectBtn fullWidth" data-button="addBait" >
+                                                Add Bait
+                                            </a>-->
+                                        </div>
+                                        <div class="flexItem">
+                                            <!--<a href="#" class="selectBtn fullWidth" data-button="noActivityBtn" onclick="NoActivity(event)">
+                                                No Activity
+                                            </a>-->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye iconGrid" viewBox="0 0 16 16">
+                                                <path fill="#4d98c2ff" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                                <path fill="#4d98c2ff" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                                            </svg>
+                                            <p style="color:#4d98c2ff;" class="fixMargin">OBSERVATION</p>
+                                        </div>
+                                        <div class="flexItem">
+                                            <!--<a href="#" class="selectBtn fullWidth" data-button="resetIR">
+                                                Reset Motion Count
+                                            </a>-->
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#4d98c2ff" class="bi bi-list-check iconGrid" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                                            </svg>
+                                            <p style="color:#4d98c2ff;" class="fixMargin">RECOMMENDATION</p>
+                                        </div>
+                                    </div>
+                                    <div class="row flex flexItemHolder">
+                                        <div class="flexItem">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-down iconGrid" viewBox="0 0 16 16">
+                                                <path fill="white" fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z" />
+                                            </svg>
+                                            <p style="color:white;" class="fixMargin">SET</p>
+                                        </div>
+                                        <div class="flexItem">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-plus-square iconGrid" viewBox="0 0 16 16">
+                                                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                            </svg>
+                                            <p style="color:white;" class="fixMargin">ADD DEVICE</p>
+                                        </div>
+                                        <div class="flexItem">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-up iconGrid" viewBox="0 0 16 16">
+                                                <path fill="white" fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z" />
+                                            </svg>
+                                            <p style="color:white;" class="fixMargin">REMOVE</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div data-section="formScreen" onclick="event.stopPropagation()" style="background-color: rgb(65, 80, 90); border: 1px solid #bfbfbf; margin-top: 15px; display: none;">
+
+                            <div data-form="formTemp">
+
+                            </div>
+                            <div data-form="formBait">
+                                <div style="margin-top:10px;">
+                                    <!-- <select data-select="BaitType" onchange="baitChanged(this)" class="select-css" style="margin-top: 15px; display:none;">
+                                        <option value="default" disabled selected>Select Bait Type</option>
+                                    </select> -->
+                                    <div>
+                                        <select data-select="BaitType" onchange="BaitDetailChanged(this)" class="select-css" style="margin-top: 15px; height: 44px; background: #646c83; ">
+                                            <option value="default" disabled selected>Select</option>
+                                        </select>
+                                    </div>
+                                    <div style="display:flex">
+                                        <p class="alignLabelCenter" style="margin-bottom: 2px;margin-top: 30px;">QTY (Blocks)</p>
+                                        <p class="alignLabelCenter" style="margin-bottom: 2px;margin-top: 30px;">QTY (GM / OZ)</p>
+
+                                    </div>
+                                    <div style="display:flex">
+                                        <div class="number-input" style="height:44px;">
+                                            <input class="quantity" min="0" data-info="qtyInput" name="quantity" value="1" type="number" onkeyup="QtyBoxChanged(this)">
+                                            <button onclick="DecrementCounter(this)" style="border-right:1px solid white;color:white;"></button>
+                                            <button onclick="IncrementCounter(this)" style="color:white;" class="plus"></button>
+                                        </div>
+                                        <p class="alignLabelCenter" style="font-size: 26px;margin-top:12px;" data-value="QtyLabel">0 / 0</p>
+                                    </div>
+                                    <label for="StationId">Next Check</label>
+
+                                    <div style="display:flex">
+                                        <div class="number-input" style="height:44px; width:100%;">
+                                            <input type="date" class="inputDate" min="0" data-info="expiryDate" onchange="ExpiryChanged(this)">
+                                        </div>
+                                    </div>
+
+                                    <select data-select="Quantity" class="select-css" style="margin-top: 15px; display:none">
+                                        <option value="default" disabled selected>Quantity</option>
+                                    </select>
+                                    <div class="flex" style="overflow: auto; margin-top:8px;  ">
+
+                                        <a data-button="cancelButton" onclick="CancelSiteBait(event)" class="selectBtn" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                            CANCEL
+                                        </a>
+                                        <a data-button="submitButton" onclick="submitSiteTrap(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                            SAVE
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-form="formSet" style="display:none;">
+                                <div style="margin-top:10px;">
+                                    <div class="PositionCheckbox" style="display: none;">
+                                        <span class="CheckboxLabel" style="cursor:pointer;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-camera" viewBox="0 0 16 16">
+                                                <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1v6zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z"></path>
+                                                <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"></path>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div style="margin-top: 10px; ">
+                                        <select data-select="DeviceTypes" onchange="DeviceTypeChanged(this)" class="select-css" style="margin-top: 15px; background: #646c83; ">
+                                            <option value="default" disabled selected>Select</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="display:flex">
+                                        <div  class="BoxLabel">
+                                            <label for="name">Name</label>
+                                            <div class="number-input" style="height:44px; width:100%;">
+                                                <input type="text" id="name" class="inputDate inputText" min="0" data-info="setNane" onchange="NameChanged(this)">
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div style="display: flex; margin-top: 8px;">
+                                        <div class="BoxLabel">
+                                            <label for="locationNotes">Location Notes</label>
+                                            <div class="number-input" style="height:44px; width:100%;">
+                                                <input type="text" id="locationNotes" class="inputDate inputText" min="0" data-info="setLocation" onchange="LocationChanged(this)">
+                                            </div>
+                                        </div>
+                                    
+                                    </div>
+    
+                                    <div style="display:flex">
+                                        <div class="BoxLabel" style="margin-right:0;">
+                                            <label for="StationId">Station Id</label>
+                                            <div style="display: flex;">
+                                                <div class="number-input" style="height: 44px; width: 84%; display: flex;">
+                                                    <input class="quantity " id="StationId" style="width:100%;  max-width:70%;" min="0" data-info="stationInput" name="quantity" value="1" type="number" onchange="StationBoxChanged(this)">
+                                                    <button onclick="DecrementCounterSet(this)" style="border-right:1px solid white;color:white;"></button>
+                                                    <button onclick="IncrementCounterSet(this)" style="color:white;" class="plus"></button>
+                                                </div>
+                                                <label style="display: flex; flex-direction: column; justify-content: center;">
+                                                    <input class="small-checkbox" type="checkbox" id="stationIdHoldCheckbox" />
+                                                    hold
+                                                </label>
+                                            </div>
+                                        </div>
+                                    
+                                    </div>
+
+
+
+                                    <select data-select="Quantity" class="select-css" style="margin-top: 15px; display:none">
+                                        <option value="default" disabled selected>Quantity</option>
+                                    </select>
+                                    <div class="flex" style="overflow: auto; margin-top:8px;  ">
+
+                                        <a data-button="cancelButton" onclick="CancelBait(event)" class="selectBtn" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                            CANCEL
+                                        </a>
+                                        <a data-button="submitButton" onclick="SetCard(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                            SAVE
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-form="RemoveDevice">
+                                <h2 style="color:white;font-size: 15px;text-align: center;">CLICK SAVE TO REMOVE DEVICE FROM THIS LOCATION?</h2>
+                                <div class="flex" style="overflow: auto; margin-top:8px;  ">
+                                    <a data-button="cancelButton" class="selectBtn" onclick="ResetIRCancel(event)" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                        CANCEL
+                                    </a>
+                                    <a data-button="submitButton" onclick="RemoveDevice(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                        SAVE
+                                    </a>
+                                </div>
+                            </div>
+                            <div data-form="ResetIR">
+                                <h2 style="color:white;font-size: 15px;text-align: center;">CLICK SAVE TO CONFIRM DEVICE RESET</h2>
+                                <div class="row" style=" display: inline-block; width: 100%;">
+                                    <div class="PositionCheckbox">
+                                        <p class="CheckboxLabel">Motion</p>
+                                        <input type="checkbox" class="CustomCheckbox" data-info="MotionCheckbox" checked style="border-radius:5px;" />
+                                    </div>
+                                    <div class="PositionCheckbox">
+                                        <p class="CheckboxLabel">Alerts</p>
+                                        <input type="checkbox" class="CustomCheckbox" data-info="AlertCheckbox" style="border-radius:5px;" />
+                                    </div>
+                                </div>
+
+                                <div class="flex" style="overflow: auto; margin-top:8px;  ">
+                                    <a data-button="cancelButton" class="selectBtn" onclick="ResetIRCancel(event)" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                        CANCEL
+                                    </a>
+                                    <a data-button="submitButton" onclick="ResetIRSubmit(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                        SAVE
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div data-form="noActivity">
+                                <h2 style="color:white;font-size: 15px;text-align: center;">CONFIRM NO ACTIVITY?</h2>
+                                <div class="flex" style="overflow: auto; margin-top:8px;  ">
+                                    <a data-button="cancelButton" class="selectBtn" onclick="ResetIRCancel(event)" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                        CANCEL
+                                    </a>
+                                    <a data-button="submitButton" onclick="NoActivitySubmit(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                        SAVE
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2697,6 +2957,8 @@
         var adjacentStationIds;
         var showActive = true;
         var deviceControlToggle = 0;
+        var siteBaitEnabled = false;
+        var siteBaitEnabledDevices = [];
 
         Date.prototype.addDays = function (days) {
             var date = new Date(this.valueOf());
@@ -3225,7 +3487,59 @@
          //   event.stopPropagation();
         }
 
+        /**
+         * Internal Function
+         * Shows the dropdown menu screen for site. Is called when some device actions are pressed such as add bait, set device, remove device, any button that makes a form appear.
+         *
+         * @param event
+         */
+         function showSiteFormScreen(event, type) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "");
+            event.parentNode.parentNode.parentNode.style.setProperty("display", "none");
 
+            if(type === 'addBait') {
+                siteClearScreen.querySelector("[data-form='formBait']").style.setProperty("display", "");
+                siteClearScreen.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
+                siteClearScreen.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
+                siteClearScreen.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
+                siteClearScreen.querySelector("[data-form='formSet']").style.setProperty("display", "none");
+            }
+
+            let types;
+            activeDropdowndataSources.forEach(x => {
+                if (x.Name === "BaitType") {
+                    types = x;
+                }
+            });
+            let elements = "";
+            let isFirst = true;
+            types.Values.forEach(x => {
+                if(isFirst) {
+                    DefaultActiveCardProduct = x;
+                    ActiveCardProduct = x;
+                    isFirst = false;
+                }
+                let currentName = "";
+                x.Name.split(" ").forEach(y=>{
+                    currentName += y;
+                });
+                elements += "<option value="+currentName+">"+x.Name+"</option>";
+            });
+            const baitDropdown = siteClearScreen.querySelector("[data-form='formBait']").querySelector("[data-select='BaitType']");
+            baitDropdown.innerHTML="";
+            baitDropdown.innerHTML=elements;
+
+            // var container = document.getElementById("container");
+            // // Offset is the amount of the card that is hidden.
+            // var offset = (cardSelected.offsetTop + cardSelected.offsetHeight - container.scrollTop) - container.offsetHeight;
+            // // Set the container scroll top so the bottom of the card is at the bottom of the container.
+            // container.scrollTop += offset;
+            // if (1 > container.offsetHeight) {
+            //     container.scrollTop = cardSelected.offsetHeight + cardSelected.offsetTop;
+            // }
+            // //   event.stopPropagation();
+        }
 
         /**
          * Internal Function
@@ -3937,10 +4251,27 @@
                 ]
             });
 
-            ActiveCardProduct = DefaultActiveCardProduct;
-            CancelBait(event);
+            if(!siteBaitEnabled) {
+                ActiveCardProduct = DefaultActiveCardProduct;
+                CancelBait(event);
+            }
         }
 
+        function submitSiteTrap() {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteBaitEnabledDevices.forEach(id => {
+                const card = document.querySelector(`[data-id="${id}"]`);
+                cardSelected = card.firstChild;
+                card.querySelector("[data-select='BaitType']").innerHTML = `<option>${siteClearScreen.querySelector("[data-select='BaitType']").value}</option>`
+                card.querySelector("[data-select='BaitType']").value = siteClearScreen.querySelector("[data-select='BaitType']").value;
+                card.querySelector("[data-info='qtyInput']").value = siteClearScreen.querySelector("[data-info='qtyInput']").value;
+                card.querySelector("[data-value='QtyLabel']").innerHTML = siteClearScreen.querySelector("[data-value='QtyLabel']").innerHTML;
+                card.querySelector("[data-info='expiryDate']").value = siteClearScreen.querySelector("[data-info='expiryDate']").value;
+                submitTrap();
+            });
+            CancelSiteBait();
+        }
+        
         function controlDeviceAction(event){
 
             deviceControlToggle = event.value;
@@ -4550,6 +4881,26 @@
 
         }
 
+        function AddSiteBait(current) {
+            event.currentTarget.parentNode.parentNode.style.setProperty("display", "");
+            document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
+                element.style.setProperty("display", "none");
+            });
+            siteBaitEnabledDevices = [];
+            siteBaitEnabled = true;
+            document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
+                siteBaitEnabledDevices.push(element.getAttribute('data-id'));
+                element.querySelector('[data-section="main"]').classList.add('disableHover');
+            })
+            // var id = cardSelected.parentNode.getAttribute("data-id");
+            // var form = cardSelected.querySelector("[data-section='formScreen']");
+            // cardSelected.querySelector("[data-info='RepeatCheckbox']").checked = false;
+            //  fw.fireEvent("ChangeBait", { ID: id, form: form  });
+            // var item = rowState[id];
+            // var screenForm = current.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("[data-section='formScreen']");
+            showSiteFormScreen(current.currentTarget, 'addBait');
+        }
+
         /**
          * Function that handles the bait enabled flag coming through flows into the rodent widget.
          * Based on the data that comes through, controls if the operator is able to add bait.
@@ -4724,6 +5075,21 @@
             event.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
             cardSelected.querySelector("[data-section='clearScreen']").querySelector("[data-section='Actions']").querySelector("[data-section='ordinaryFormBtn']").style.setProperty("display", "");
 
+        }
+
+        function CancelSiteBait(current) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
+            siteBaitEnabledDevices = [];
+            siteBaitEnabled = false;
+            document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
+                element.style.setProperty("display", "");
+            });
+            document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
+                element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
+                element.querySelector('[data-section="main"]').classList.remove('disableHover');
+            });
         }
 
 
@@ -4926,6 +5292,18 @@
          * @param event
          */
         function toggleClearScreen(event) {
+
+            if(siteBaitEnabled) {
+                const id = event.parentNode.parentNode.getAttribute('data-id');
+                if(siteBaitEnabledDevices.indexOf(id) > -1) {
+                    siteBaitEnabledDevices = siteBaitEnabledDevices.filter(device => device !== id);
+                    event.classList.add('whiteBackgroundCard');
+                } else {
+                    siteBaitEnabledDevices.push(id);
+                    event.classList.remove('whiteBackgroundCard');
+                }
+                return;
+            }
             
             var clearScreen = event.querySelector("[data-section='clearScreen']");
             if (clearScreen.style.display == "none") {
@@ -5173,6 +5551,7 @@
             rowState = {};
             var collection = packet.value.value;
             rowKeys = Object.keys(collection.data);
+            let baitEnalbed = false;
             for (var i = 0; i < rowKeys.length; i++) {
                 var card = rowElems[rowKeys[i]];
                 if (card == undefined) {
@@ -5182,8 +5561,14 @@
                     card.style.setProperty("display", "");
                     rowElems[rowKeys[i]] = card;
                     // Add to table.
-                    var statusIndex = collection._columnMap.Status;
-                    AddCardChild(rowKeys[i], card, cardSelectedParent, collection.data[parseInt(rowKeys[i])][statusIndex]? collection.data[parseInt(rowKeys[i])][statusIndex] : '0');
+                    var statusIndex = collection._columnMap.Status;                    
+                    var baitEnabledIndex = collection._columnMap.BaitEnalbed;
+                    AddCardChild(rowKeys[i], card, cardSelectedParent,
+                        collection.data[parseInt(rowKeys[i])][statusIndex] ?
+                        collection.data[parseInt(rowKeys[i])][statusIndex] : '0',
+                        collection.data[parseInt(rowKeys[i])][baitEnabledIndex] ?
+                        collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1'
+                    );
                     rowState[rowKeys[i]] = {};
                     rowState[rowKeys[i]]["rowId"] = rowKeys[i];
 
@@ -5202,6 +5587,12 @@
                 for (var j = 0; j < collection.headers.length; j++) {
                     var headerValue = collection.headers[j];
                     var elem = card.querySelector("[data-value='" + headerValue + "']");
+
+                    if(headerValue === 'BaitEnalbed') {
+                        if (!baitEnalbed && collection.data[rowKeys[i]][j] === "1" ) {
+                            baitEnalbed = true;
+                        }
+                    }
 
                     // It may not exist.
                     if (elem !== null) {
@@ -5427,7 +5818,7 @@
                                     let lowerLimit = parseInt(collection.getColumn("BatteryLower")[i]);
 
                                     let batteryPercentage = Math.max(0, Math.min(100, 100 - ((upperLimit - batteryVoltage) / 2)));
-                                    card.querySelector("[data-section='BatteryVal']").innerHTML = batteryPercentage.toString() + "%";
+                                    card.querySelector("[data-section='BatteryVal']").innerHTML = parseInt(batteryPercentage) + "%";
                                     SetCardLineColorPercentage(card, batteryPercentage, "UnderlineBattery");
                                 } else {
                                     card.querySelector("[data-info='UnderlineBattery']").setAttribute("class", "UnderlineGray")
@@ -5706,7 +6097,18 @@
                 //    DisableDevice(rowState[rowKeys[i]]);
                 //}
             }
-
+            
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            if(rowKeys.length === 0) {
+                siteClearScreen.querySelector('.bi-arrow-bar-down').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-arrow-bar-down').parentNode.style.opacity = '0.3';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').parentNode.style.opacity = '0.3';
+            }
+            if(!baitEnalbed) {
+                siteClearScreen.querySelector('.bi-plus-circle').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-plus-circle').parentNode.style.opacity = '0.3';
+            }
             fw.fireEvent("children populated", 0);
 
             //fw_feed(null, null, null);
@@ -6292,7 +6694,7 @@
                         //     daysData[i].IsSet = true;
                         // }
                         // Check if the day is the same, replace the corresponding day
-                        if (record.key === daysData[i].key) {
+                        if (record.key == daysData[i].key) {
                             daysData[i].key = record.key;
                             daysData[i].Day = record.Day;
                             daysData[i].score = record.score;
@@ -6651,7 +7053,12 @@
             backBtn.style.setProperty("position", "relative");
             backBtn.style.setProperty("right", "0");
 
+            const hoursLabel = document.createElement('div');
+            hoursLabel.innerHTML = "Hours";
+            hoursLabel.classList.add('hoursLabel');
+
             chart.appendChild(legend);
+            chart.appendChild(hoursLabel);
             chart.appendChild(backBtn);
 
             cChart.innerHTML = chart.outerHTML;
@@ -7061,7 +7468,7 @@
         }
 
 
-        function AddCardChild(id, card, parent, status) {
+        function AddCardChild(id, card, parent, status, baitEnabled) {
 
             var cardBody = parent.querySelector("[data-selector='Traps']");
             var row = document.createElement("div");
@@ -7069,6 +7476,8 @@
             row.setAttribute("data-id", id);
             if(status)
                 row.setAttribute("data-status", status);
+            if(baitEnabled)
+                row.setAttribute("data-bait-enabled", baitEnabled);
             if(showActive && status == '0'){
                 row.style.display = 'none';
             }
@@ -7343,8 +7752,6 @@
                                             break;
                                     }
                                 }
-
-
                             }
                         }
                     }
@@ -7357,6 +7764,28 @@
                 throw new TypeError("Expected a string but found " + typeof data.value);
             }
 
+        }
+
+        function toggleSiteClearScreen(event) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            const toggle = document.querySelector('.toggleSiteClearScreen');
+            if(siteClearScreen.style.display === 'none') {
+                siteClearScreen.style.display = '';
+                toggle.classList.add('rotate');
+            } else {
+                siteClearScreen.style.display = 'none';
+                toggle.classList.remove('rotate');
+                siteBaitEnabledDevices = [];
+                siteBaitEnabled = false;
+                document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
+                    element.style.setProperty("display", "");
+                });
+            document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
+                element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
+                element.querySelector('[data-section="main"]').classList.remove('disableHover');
+            });
+            }
+            event.stopPropagation();
         }
 
         function CheckSignalStrenght(dBm) {
