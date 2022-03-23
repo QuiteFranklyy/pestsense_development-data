@@ -2572,7 +2572,7 @@
                                             <p style="color:white;" class="fixMargin">SET</p>
                                         </div>
                                         <div class="flexItem">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-plus-square iconGrid" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg"  onclick="AddSiteDevice(event)" width="40" height="40" fill="white" class="bi bi-plus-square iconGrid" viewBox="0 0 16 16">
                                                 <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
                                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                             </svg>
@@ -2635,6 +2635,46 @@
                                             CANCEL
                                         </a>
                                         <a data-button="submitButton" onclick="submitSiteTrap(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                            SAVE
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-form="formAddDevice">
+                                <div style="margin-top:10px;">
+                                    <!-- <select data-select="BaitType" onchange="baitChanged(this)" class="select-css" style="margin-top: 15px; display:none;">
+                                        <option value="default" disabled selected>Select Bait Type</option>
+                                    </select> -->
+                                    <h2 style="color:white;font-size: 16px; margin: 8px;">ADD DEVICE</h2>
+                                    <div>
+                                        <label>Model Type</label>
+                                        <select data-select="DeviceType" onchange="ModelTypeChanged(this)" class="select-css" style="height: 44px; background: #646c83; ">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Model</label>
+                                        <select data-select="Device" onchange="ModelChanged(this)" class="select-css" style="height: 44px; background: #646c83; ">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Quantity</label>
+                                        <div class="number-input" style="height: 44px; display: flex; border-radius: 5px;">
+                                            <input class="quantity" data-input="deviceQuantity" style="width:100%;  max-width:70%;" min="0" value="1" type="number" onchange="StationBoxChanged(this)">
+                                            <button onclick="DecrementCounterSet(this)" style="border-right:1px solid white;color:white;"></button>
+                                            <button onclick="IncrementCounterSet(this)" style="color:white;" class="plus"></button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Name</label>
+                                        <div class="number-input" style="height:44px; width:96%; border-radius: 5px;">
+                                            <input data-input="deviceName" type="text" class="inputDate inputText">
+                                        </div>
+                                    </div>
+                                    <div class="flex" style="overflow: auto; margin-top:8px;  ">
+                                        <a data-button="cancelButton" onclick="CancelSiteAddDevice(event)" class="selectBtn" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                            CANCEL
+                                        </a>
+                                        <a data-button="submitButton" onclick="submitAddDevices(event)" class="selectBtn" style="margin:0px;width:100%;">
                                             SAVE
                                         </a>
                                     </div>
@@ -2827,7 +2867,10 @@
                     "setTopPosition": setTopPosition,
                     "setSiteId": setSiteId,
                     "SetCurrentStationId": SetCurrentStationId,
-                    "SetAdjacentStationIds": SetAdjacentStationIds
+                    "SetAdjacentStationIds": SetAdjacentStationIds,
+                    "SetModelTypes": setModelTypes,
+                    "SetModels": setModels,
+                    "SetApplicationSettings": setApplicationSettings,
                 },
                 outputEvents: 
                 [
@@ -2959,6 +3002,10 @@
         var deviceControlToggle = 0;
         var siteBaitEnabled = false;
         var siteBaitEnabledDevices = [];
+        var modelTypes = [];
+        var models = [];
+        var filteredModels = [];
+        var applicationSettings = {};
 
         Date.prototype.addDays = function (days) {
             var date = new Date(this.valueOf());
@@ -4271,6 +4318,24 @@
             });
             CancelSiteBait();
         }
+
+        function submitAddDevices() {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            const deviceModelTypeId = siteClearScreen.querySelector('[data-select="DeviceType"]').value;
+            const deviceModelId = siteClearScreen.querySelector('[data-select="Device"]').value;
+            const deviceQuantity = siteClearScreen.querySelector('[data-input="deviceQuantity"]').value;
+            const deviceName = siteClearScreen.querySelector('[data-input="deviceName"]').value;
+            const locationId = document.querySelector('tbody').querySelector('tr').getAttribute('data-id');
+            fw.func("PUBLISHCLIENT", "AddDevices", {
+                deviceModelTypeId,
+                deviceModelId,
+                deviceQuantity: parseInt(deviceQuantity),
+                deviceName,
+                locationId,
+                nonSmartDeviceID: applicationSettings["Non Smart Device ID"]
+            });
+            CancelSiteAddDevice();
+        }
         
         function controlDeviceAction(event){
 
@@ -4808,6 +4873,33 @@
             adjacentStationIds = eventData.value;
         }
 
+        function setModelTypes(eventData) {
+            modelTypes = eventData.value;
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            modelTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.id;
+                option.innerHTML = type.name;
+                siteClearScreen.querySelector("[data-select='DeviceType']").appendChild(option);
+            })
+            filteredModels = models.filter(model => model.modelType === modelTypes[0].id);
+            siteClearScreen.querySelector("[data-select='Device']").innerHTML = ""
+            filteredModels.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.innerHTML = model.name;
+                siteClearScreen.querySelector("[data-select='Device']").appendChild(option);
+            })
+        }
+
+        function setModels(eventData) {
+            models = eventData.value;
+        }
+
+        function setApplicationSettings(eventData) {
+            applicationSettings = eventData.value;
+        }
+
         function SetDeviceCard(current) {
             var id = cardSelected.parentNode.getAttribute("data-id");
              
@@ -4899,6 +4991,33 @@
             // var item = rowState[id];
             // var screenForm = current.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("[data-section='formScreen']");
             showSiteFormScreen(current.currentTarget, 'addBait');
+        }
+
+        function AddSiteDevice(current) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "");
+            event.currentTarget.parentNode.parentNode.parentNode.style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='formBait']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='formSet']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='formAddDevice']").style.setProperty("display", "");
+        }
+
+        function ModelTypeChanged(current) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-select='Device']").innerHTML = ""
+            filteredModels = models.filter(model => model.modelType === current.value);
+            filteredModels.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.innerHTML = model.name;
+                siteClearScreen.querySelector("[data-select='Device']").appendChild(option);
+            });
+        }
+
+        function ModelChanged(current) {
         }
 
         /**
@@ -5092,6 +5211,11 @@
             });
         }
 
+        function CancelSiteAddDevice(event) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
+        }
 
         function ShowAdvisories(event) {
             fw.func("JUMPSCREEN", "Show Advisories");
@@ -5376,8 +5500,10 @@
                     toggle.setAttribute("class", "activeToggle");
                     cardSelected.querySelector('[data-info="chart"]').style.setProperty("display", "none");
 
-                    var name = rowState[id].DeviceNumber;
-                    fw.fireEvent("ChildCardToggled", name);
+                    // var name = rowState[id].DeviceNumber;
+                    var name = id;
+                    var sendValue = {deviceId: id, deviceNumber: rowState[id].DeviceNumber};
+                    fw.fireEvent("ChildCardToggled", sendValue);
 
 
 
@@ -5552,6 +5678,12 @@
             var collection = packet.value.value;
             rowKeys = Object.keys(collection.data);
             let baitEnalbed = false;
+            document.querySelector('tbody')
+                .querySelector('tr').querySelectorAll('div')
+                .forEach(element => {
+                    if(element.getAttribute("data-id"))
+                        element.remove();
+                })
             for (var i = 0; i < rowKeys.length; i++) {
                 var card = rowElems[rowKeys[i]];
                 if (card == undefined) {
@@ -5561,13 +5693,20 @@
                     card.style.setProperty("display", "");
                     rowElems[rowKeys[i]] = card;
                     // Add to table.
-                    var statusIndex = collection._columnMap.Status;                    
-                    var baitEnabledIndex = collection._columnMap.BaitEnalbed;
+                    var statusIndex = collection._columnMap.Status;     
+                    var baitEnabledIndex = collection._columnMap.BaitEnalbed;     
+                    var deviceTypeIndex = collection._columnMap.DeviceType;
+                    let iconUrl = '';
+                    const model = models.find(model => model.id === collection.data[parseInt(rowKeys[i])][deviceTypeIndex]);
+                    if(model) {
+                        iconUrl = model.iconUrl;
+                    }
                     AddCardChild(rowKeys[i], card, cardSelectedParent,
                         collection.data[parseInt(rowKeys[i])][statusIndex] ?
                         collection.data[parseInt(rowKeys[i])][statusIndex] : '0',
                         collection.data[parseInt(rowKeys[i])][baitEnabledIndex] ?
-                        collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1'
+                        collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1',
+                        iconUrl
                     );
                     rowState[rowKeys[i]] = {};
                     rowState[rowKeys[i]]["rowId"] = rowKeys[i];
@@ -6107,6 +6246,7 @@
             }
             if(!baitEnalbed) {
                 siteClearScreen.querySelector('.bi-plus-circle').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-plus-circle').style.pointerEvents = 'none';
                 siteClearScreen.querySelector('.bi-plus-circle').parentNode.style.opacity = '0.3';
             }
             fw.fireEvent("children populated", 0);
@@ -7468,10 +7608,16 @@
         }
 
 
-        function AddCardChild(id, card, parent, status, baitEnabled) {
+        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl) {
 
             var cardBody = parent.querySelector("[data-selector='Traps']");
             var row = document.createElement("div");
+            if(iconUrl) {
+                const smartIcon = card.querySelector('[data-info="iconSmart"]');
+                const icon = document.createElement('img');
+                icon.src = iconUrl;
+                smartIcon.parentNode.replaceChild(icon, smartIcon);
+            }
             row.appendChild(card);
             row.setAttribute("data-id", id);
             if(status)
