@@ -1800,31 +1800,7 @@
                                 </svg>
                                 <!--Dummy Trap Icon end-->
                                 <!--Smart Trap Icon start-->
-                                <svg data-info="iconSmart"
-                                     style="margin-top: 12px; display:none;"
-                                     xmlns:dc="http://purl.org/dc/elements/1.1/"
-                                     xmlns:cc="http://creativecommons.org/ns#"
-                                     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                                     xmlns:svg="http://www.w3.org/2000/svg"
-                                     xmlns="http://www.w3.org/2000/svg"
-                                     id="svg29831"
-                                     version="1.1"
-                                     viewBox="0 0 16.933333 16.933333"
-                                     height="25"
-                                     width="25">
-                                    <defs id="defs29825" />
-
-                                    <g transform="translate(0,-280.06667)" id="layer1">
-                                        <g transform="matrix(0.99308565,0,0,0.99308565,-104.14524,81.741953)" id="g25310">
-                                            <path id="path24992" d="m 110.9523,208.5002 c 0.19067,-1.56225 1.18424,-2.13723 2.4862,-2.2128" style="fill:none;fill-opacity:1;stroke:#41505a;stroke-width:0.84635907;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-                                            <g transform="matrix(0.35277777,0,0,-0.35277777,216.07457,636.91667)" id="g7816-3-6-0-8-5">
-                                                <path id="path6880-5-6-9-2-2" d="m -270.79532,1212.4821 v -17.9842 h -40.40178 v 40.8342 h 40.03112 v -6.7954" style="fill:none;stroke:#41505a;stroke-width:7.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-                                            </g>
-                                            <path style="opacity:1;fill:#41505a;fill-opacity:1;stroke:#41505a;stroke-width:0.80306929;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" id="path24990-5" d="m 114.24228,208.69815 a 0.82466435,0.82466435 0 0 1 -0.8219,0.82466 0.82466435,0.82466435 0 0 1 -0.82741,-0.81914 0.82466435,0.82466435 0 0 1 0.81637,-0.83014 0.82466435,0.82466435 0 0 1 0.83287,0.81358" />
-                                            <path style="fill:none;fill-opacity:1;stroke:#41505a;stroke-width:1.03047788;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 109.27007,208.23222 c 0.16348,-0.94022 0.45971,-1.66746 0.85972,-2.21848 0.75304,-1.03726 1.87392,-1.45007 3.16954,-1.48368" id="path24992-1-6" />
-                                        </g>
-                                    </g>
-                                </svg>
+                                <img data-info="iconSmart" style="margin-top: 15px;" />
                                 <!--Smart Trap Icon end-->
                                 <!--Smart Trap Error Icon start-->
                                 <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -2656,15 +2632,15 @@
                                         <select data-select="Device" onchange="ModelChanged(this)" class="select-css" style="height: 44px; background: #646c83; ">
                                         </select>
                                     </div>
-                                    <div>
+                                    <div style="display: none;">
                                         <label>Quantity</label>
                                         <div class="number-input" style="height: 44px; display: flex; border-radius: 5px;">
-                                            <input class="quantity" data-input="deviceQuantity" style="width:100%;  max-width:70%;" min="0" value="1" type="number" onchange="StationBoxChanged(this)">
-                                            <button onclick="DecrementCounterSet(this)" style="border-right:1px solid white;color:white;"></button>
-                                            <button onclick="IncrementCounterSet(this)" style="color:white;" class="plus"></button>
+                                            <input class="quantity" data-input="deviceQuantity" style="width:100%;  max-width:70%;" min="0" value="1" type="number" onchange="DeviceQuantityChanged(this)">
+                                            <button onclick="DecrementSiteCounterSet(this)" style="border-right:1px solid white;color:white;"></button>
+                                            <button onclick="IncrementSiteCounterSet(this)" style="color:white;" class="plus"></button>
                                         </div>
                                     </div>
-                                    <div>
+                                    <div style="display: none;">
                                         <label>Name</label>
                                         <div class="number-input" style="height:44px; width:96%; border-radius: 5px;">
                                             <input data-input="deviceName" type="text" class="inputDate inputText">
@@ -2674,7 +2650,7 @@
                                         <a data-button="cancelButton" onclick="CancelSiteAddDevice(event)" class="selectBtn" style="margin:0px;width:100%;border-right:1px solid #fff;">
                                             CANCEL
                                         </a>
-                                        <a data-button="submitButton" onclick="submitAddDevices(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                        <a data-button="submitButton" onclick="submitAddDevices(event)" class="selectBtn" style="margin:0px;width:100%; display: none;">
                                             SAVE
                                         </a>
                                     </div>
@@ -4559,6 +4535,32 @@
             }
         }
 
+        function DecrementSiteCounterSet(event) {
+            const input = event.parentNode.querySelector('input');
+            const value = parseInt(input.value);
+            if(value > 0) {
+                input.value = value - 1;
+            }
+        }
+
+        function IncrementSiteCounterSet(event) {
+            const input = event.parentNode.querySelector('input');
+            const value = parseInt(input.value);
+            if(value < parseInt(applicationSettings['Non Smart Max Quantity'])) {
+                input.value = value + 1;
+            }
+        }
+
+        function DeviceQuantityChanged(event) {
+            const value = parseInt(event.value);
+            if(value < 0) {
+                event.value = 0;
+            }
+            if(value > parseInt(applicationSettings['Non Smart Max Quantity'])) {
+                event.value = parseInt(applicationSettings['Non Smart Max Quantity']);
+            }
+        }
+
         /**
         * Broadcasts an event when a card quantity has changed
         *
@@ -5015,6 +5017,15 @@
                 option.innerHTML = model.name;
                 siteClearScreen.querySelector("[data-select='Device']").appendChild(option);
             });
+            if(current.value === "2"){
+                siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "";
+                siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "";
+                siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "";
+            } else {
+                siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "none";
+                siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "none";
+                siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "none";
+            }
         }
 
         function ModelChanged(current) {
@@ -7614,9 +7625,7 @@
             var row = document.createElement("div");
             if(iconUrl) {
                 const smartIcon = card.querySelector('[data-info="iconSmart"]');
-                const icon = document.createElement('img');
-                icon.src = iconUrl;
-                smartIcon.parentNode.replaceChild(icon, smartIcon);
+                smartIcon.src = iconUrl;
             }
             row.appendChild(card);
             row.setAttribute("data-id", id);
