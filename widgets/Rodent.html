@@ -796,6 +796,10 @@
     border-left: 8px solid orange;
     }
 
+    .SideBarBrown {
+    border-left: 8px solid #784421;
+    }
+
     .SideBarRed {
     border-left: 8px solid red;
     }
@@ -1417,7 +1421,7 @@
     }
 
     .flexItem {
-    width: 100%;
+    width: 50%;
     }
 
     .iconGrid {
@@ -2060,7 +2064,7 @@
 
                         <div class="ct-chart ct-golden-section" data-info="lineChart" style="display:none;"></div>
                     </div>
-                    <div class="flex" style="flex-direction:row; justify-content:space-evenly;  margin-bottom: 20px; width:100%;text-align:center;">
+                    <div class="flex" style="flex-direction:row; justify-content:space-evenly;  margin-bottom: 20px; margin-top: 8px; width:100%;text-align:center;">
 
                         <div style="width:100%;display:grid;">
                             <span style="float: left; margin-right: 0; color: #ffffffff;font-weight: normal;" class="LabelStyle">
@@ -2308,6 +2312,7 @@
                                     </span>
                                 </div>
                                 <div style="margin-top: 10px; ">
+                                    <label>Configuration</label>
                                     <select data-select="DeviceTypes" onchange="DeviceTypeChanged(this)" class="select-css" style="margin-top: 15px; background: #646c83; ">
                                         <option value="default" disabled selected>Select</option>
                                     </select>
@@ -2423,7 +2428,7 @@
                 <div data-section="cell">
                     <div>
                         <div class="container flex" style="margin: 8px 8px 4px 0; ">
-                            <div class="col-left" style="border-right: 0.98px solid #9b9b9bff;width:42%;">
+                            <div class="col-left" style="width:52%;">
                                 <div class="iconWidth PositionIcon">
                                     <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg29831" version="1.1" viewBox="0 0 16.933333 16.933333" height="36" width="36">
                                         <g id="g8856" transform="matrix(1.0393596,0,0,1.0918312,-144.64395,-96.576359)">
@@ -2453,7 +2458,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div style="float: right; margin-right: -12px; display: flex; width:62%;">
+                            <div style="float: right; margin-right: -12px; display: flex; width:50%;">
 
                                 <div class="displayContainer" style=" text-align: center;margin-left: 10px; width:100%;">
                                     <span class="ValueStyle" data-value="Urgent">
@@ -2555,7 +2560,7 @@
                                             <p style="color:white;" class="fixMargin">ADD DEVICE</p>
                                         </div>
                                         <div class="flexItem">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-up iconGrid" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg" onclick="StartSiteRemove(event)" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-up iconGrid" viewBox="0 0 16 16">
                                                 <path fill="white" fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z" />
                                             </svg>
                                             <p style="color:white;" class="fixMargin">REMOVE</p>
@@ -2667,6 +2672,7 @@
                                         </span>
                                     </div>
                                     <div style="margin-top: 10px; ">
+                                        <label>Configuration</label>
                                         <select data-select="DeviceTypes" onchange="DeviceTypeChanged(this)" class="select-css" style="margin-top: 15px; background: #646c83; ">
                                             <option value="default" disabled selected>Select</option>
                                         </select>
@@ -2726,12 +2732,12 @@
                                 </div>
                             </div>
                             <div data-form="RemoveDevice">
-                                <h2 style="color:white;font-size: 15px;text-align: center;">CLICK SAVE TO REMOVE DEVICE FROM THIS LOCATION?</h2>
+                                <h2 style="color:white;font-size: 15px;text-align: center;">CLICK SAVE TO REMOVE DEVICES FROM THIS LOCATION?</h2>
                                 <div class="flex" style="overflow: auto; margin-top:8px;  ">
-                                    <a data-button="cancelButton" class="selectBtn" onclick="ResetIRCancel(event)" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                    <a data-button="cancelButton" class="selectBtn" onclick="ResetSiteIRCancel(event)" style="margin:0px;width:100%;border-right:1px solid #fff;">
                                         CANCEL
                                     </a>
-                                    <a data-button="submitButton" onclick="RemoveDevice(event)" class="selectBtn" style="margin:0px;width:100%;">
+                                    <a data-button="submitButton" onclick="RemoveSiteDevices(event)" class="selectBtn" style="margin:0px;width:100%;">
                                         SAVE
                                     </a>
                                 </div>
@@ -2902,7 +2908,7 @@
         var cardChildTemplate = document.getElementById("cardChildTemplate");
 
         // enum type object to remove magic numbers for card state - State is the red, yellow, green, grey colour of the card
-        const CardState = {UrgentRed: 4, ImportantYellow: 3, NormalGreen: 2, DeactivatedGrey: 1, Unassigned: 0};
+        const CardState = { NonSmart: 0 ,UrgentRed: 4, ImportantYellow: 3, NormalGreen: 2, DeactivatedGrey: 1, Unassigned: 5 };
         // status is whether the device is enabled or disabled.
         const CardStatus = {Disabled: 0, Enabled: 1};
 
@@ -2977,7 +2983,8 @@
         var showActive = true;
         var deviceControlToggle = 0;
         var siteBaitEnabled = false;
-        var siteBaitEnabledDevices = [];
+        var siteRemoveEnabled = false;
+        var siteSelectedDevices = [];
         var modelTypes = [];
         var models = [];
         var filteredModels = [];
@@ -3380,6 +3387,7 @@
             }
 
             var select = cardChildTemplate.querySelector("[data-select='" + elementName + "']");
+            select.innerHTML = "";
             for (var i = 0; i < optionsArray.length; i++) {
                 select.appendChild(optionsArray[i]);
             }
@@ -3389,7 +3397,7 @@
             for (var i = 0; i < rowKeys.length; i++) {
                 var row = rowElems[rowKeys[i]];
                 var selectNode = row.querySelector("[data-select='" + elementName + "']");
-
+                selectNode.innerHTML = "";
                 // If no trap types have been added we need to add them all.
                 if (selectNode.children.length === 1) {
                     var opKeys = Object.keys(SelectVlueObj);
@@ -3527,6 +3535,7 @@
                 siteClearScreen.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
                 siteClearScreen.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
                 siteClearScreen.querySelector("[data-form='formSet']").style.setProperty("display", "none");
+                siteClearScreen.querySelector("[data-form='formAddDevice']").style.setProperty("display", "none");
             }
 
             let types;
@@ -4282,7 +4291,7 @@
 
         function submitSiteTrap() {
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
-            siteBaitEnabledDevices.forEach(id => {
+            siteSelectedDevices.forEach(id => {
                 const card = document.querySelector(`[data-id="${id}"]`);
                 cardSelected = card.firstChild;
                 card.querySelector("[data-select='BaitType']").innerHTML = `<option>${siteClearScreen.querySelector("[data-select='BaitType']").value}</option>`
@@ -4607,6 +4616,17 @@
 
         }
 
+        function ResetSiteIRCancel(current) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-section='SmartDevice']").style.setProperty("display", "");
+            siteRemoveEnabled = false;
+            document.querySelectorAll("div[data-id]").forEach(element => {
+                element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
+                element.querySelector('[data-section="main"]').classList.remove('disableHover');
+            });
+        }
+
         function setSiteId(eventData) {
             siteId = eventData.value;
         }
@@ -4739,6 +4759,14 @@
 
         }
 
+        function RemoveSiteDevices() {
+            siteSelectedDevices.forEach(id => {
+                cardSelected = document.querySelector(`[data-id='${id}']`).firstChild;
+                RemoveDevice();
+            });
+            ResetSiteIRCancel();
+        }
+
         function RemoveDevice() {
               
             var id = cardSelected.parentNode.getAttribute("data-id");
@@ -4863,6 +4891,26 @@
 
         }
 
+        function StartSiteRemove(current) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-form='formBait']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "");
+            siteClearScreen.querySelector("[data-form='formSet']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-form='formAddDevice']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-section='SmartDevice']").style.setProperty("display", "none");
+            siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "");
+            siteSelectedDevices = [];
+            siteRemoveEnabled = true;
+            closeAllOpenDeviceCards();
+            document.querySelectorAll("div[data-id]").forEach(element => {
+                siteSelectedDevices.push(element.getAttribute('data-id'));
+                element.querySelector('[data-section="main"]').classList.add('disableHover');
+            });
+            // showFormScreen(current.currentTarget);
+        }
+
         function SetCurrentStationId(eventData) {
             currentStationId = parseInt(eventData.value);
             // May not be defined in DB
@@ -4876,8 +4924,10 @@
         }
 
         function setModelTypes(eventData) {
+            modelTypes = [];
             modelTypes = eventData.value;
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            siteClearScreen.querySelector("[data-select='DeviceType']").innerHTML = ""
             modelTypes.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type.id;
@@ -4895,6 +4945,7 @@
         }
 
         function setModels(eventData) {
+            models = [];
             models = eventData.value;
         }
 
@@ -4947,7 +4998,7 @@
                 minDown = rowState[id].StationId;
             }
 
-            cardSelected.querySelector("[data-select='DeviceTypes']").value = selectedDeviceType;
+            // cardSelected.querySelector("[data-select='DeviceTypes']").value = selectedDeviceType;
             cardSelected.querySelector("[data-info='setNane']").value = rowState[id].DeviceName;
             if(rowState[id].Location !== undefined)
             {
@@ -4980,10 +5031,11 @@
             document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
                 element.style.setProperty("display", "none");
             });
-            siteBaitEnabledDevices = [];
+            siteSelectedDevices = [];
             siteBaitEnabled = true;
+            closeAllOpenDeviceCards();
             document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
-                siteBaitEnabledDevices.push(element.getAttribute('data-id'));
+                siteSelectedDevices.push(element.getAttribute('data-id'));
                 element.querySelector('[data-section="main"]').classList.add('disableHover');
             })
             // var id = cardSelected.parentNode.getAttribute("data-id");
@@ -5005,23 +5057,32 @@
             siteClearScreen.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
             siteClearScreen.querySelector("[data-form='formSet']").style.setProperty("display", "none");
             siteClearScreen.querySelector("[data-form='formAddDevice']").style.setProperty("display", "");
+            closeAllOpenDeviceCards();
         }
 
         function ModelTypeChanged(current) {
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
             siteClearScreen.querySelector("[data-select='Device']").innerHTML = ""
             filteredModels = models.filter(model => model.modelType === current.value);
+            if(filteredModels.length > 1) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.innerHTML = "--select--";
+                siteClearScreen.querySelector("[data-select='Device']").appendChild(option);
+            } else {
+                if(current.value === "2") {
+                    siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "";
+                    siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "";
+                    siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "";
+                }
+            }
             filteredModels.forEach(model => {
                 const option = document.createElement('option');
                 option.value = model.id;
                 option.innerHTML = model.name;
                 siteClearScreen.querySelector("[data-select='Device']").appendChild(option);
             });
-            if(current.value === "2"){
-                siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "";
-                siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "";
-                siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "";
-            } else {
+            if(current.value !== "2") {
                 siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "none";
                 siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "none";
                 siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "none";
@@ -5029,6 +5090,19 @@
         }
 
         function ModelChanged(current) {
+            const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            const deviceType = siteClearScreen.querySelector('[data-select="DeviceType"]');
+            if(deviceType.value === "2") {
+                if(current.value){
+                siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "";
+                siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "";
+                siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "";
+                } else {
+                    siteClearScreen.querySelector('[data-input="deviceQuantity"]').parentNode.parentNode.style.display = "none";
+                    siteClearScreen.querySelector('[data-input="deviceName"]').parentNode.parentNode.style.display = "none";
+                    siteClearScreen.querySelector('[data-form="formAddDevice"]').querySelector('[data-button="submitButton"]').style.display = "none";
+                }
+            }
         }
 
         /**
@@ -5211,7 +5285,7 @@
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
             siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "none");
             siteClearScreen.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
-            siteBaitEnabledDevices = [];
+            siteSelectedDevices = [];
             siteBaitEnabled = false;
             document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
                 element.style.setProperty("display", "");
@@ -5220,12 +5294,22 @@
                 element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
                 element.querySelector('[data-section="main"]').classList.remove('disableHover');
             });
+            siteClearScreen.querySelector("[data-select='BaitType']").value = DefaultActiveCardProduct.Name;
+            siteClearScreen.querySelector("[data-info='qtyInput']").value = 1;
+            QtySet = 1;
+            var temp = DefaultActiveCardProduct.WeightPerBlock;
+            siteClearScreen.querySelector("[data-value='QtyLabel']").innerHTML = Math.round((parseInt(QtySet) * temp), 2) + " / " + ((parseInt(QtySet) * temp) * 0.035274).toString().substr(0,3);
+            siteClearScreen.querySelector("[data-info='expiryDate']").value = 'dd-mm-yyyy';
         }
 
         function CancelSiteAddDevice(event) {
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
             siteClearScreen.querySelector("[data-section='formScreen']").style.setProperty("display", "none");
             siteClearScreen.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
+            siteClearScreen.querySelector('[data-input="deviceName"]').value = "";
+            siteClearScreen.querySelector('[data-input="deviceQuantity"]').value = 1;
+            siteClearScreen.querySelector('[data-select="DeviceType"]').value = modelTypes[0].id;
+            ModelTypeChanged(siteClearScreen.querySelector('[data-select="DeviceType"]'));
         }
 
         function ShowAdvisories(event) {
@@ -5243,7 +5327,7 @@
             if (typeof value !== "number") {
                 throw new TypeError("Value must be a number, found '" + typeof value + "'.");
             }
-            if (value > 4 || value < 0) {
+            if (value > 5 || value < 0) {
 
                 throw new Error("State value must either 0, 1, 2, 4. Found " + value);
             }
@@ -5335,6 +5419,19 @@
 
                     });
                     sideStatus.setAttribute("class", "normalCardBorder SideBarYellow");
+                    break;
+                case CardState.NonSmart:
+                    Database.saveRecordParam("Rodent", "Devices", {
+                        id:
+                        {
+                            "Id": id,
+                            "State": CardState.NonSmart,
+
+                        }
+                    }, function (data) {
+
+                    });
+                    sideStatus.setAttribute("class", "normalCardBorder SideBarBrown");
                     break;
 
             }
@@ -5428,13 +5525,13 @@
          */
         function toggleClearScreen(event) {
 
-            if(siteBaitEnabled) {
+            if(siteBaitEnabled || siteRemoveEnabled) {
                 const id = event.parentNode.parentNode.getAttribute('data-id');
-                if(siteBaitEnabledDevices.indexOf(id) > -1) {
-                    siteBaitEnabledDevices = siteBaitEnabledDevices.filter(device => device !== id);
+                if(siteSelectedDevices.indexOf(id) > -1) {
+                    siteSelectedDevices = siteSelectedDevices.filter(device => device !== id);
                     event.classList.add('whiteBackgroundCard');
                 } else {
-                    siteBaitEnabledDevices.push(id);
+                    siteSelectedDevices.push(id);
                     event.classList.remove('whiteBackgroundCard');
                 }
                 return;
@@ -5712,12 +5809,14 @@
                     if(model) {
                         iconUrl = model.iconUrl;
                     }
+                    const modelType = modelTypes.find(modelType => modelType.id === model.modelType);
                     AddCardChild(rowKeys[i], card, cardSelectedParent,
                         collection.data[parseInt(rowKeys[i])][statusIndex] ?
                         collection.data[parseInt(rowKeys[i])][statusIndex] : '0',
                         collection.data[parseInt(rowKeys[i])][baitEnabledIndex] ?
                         collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1',
-                        iconUrl
+                        iconUrl,
+                        modelType?.isSmart
                     );
                     rowState[rowKeys[i]] = {};
                     rowState[rowKeys[i]]["rowId"] = rowKeys[i];
@@ -6242,7 +6341,8 @@
                         }
                     }
                 }
-                setDeviceStatus(rowKeys[i]);
+                if(collection.data[rowKeys[i]][4] != "0")
+                    setDeviceStatus(rowKeys[i]);
                 //if (rowState[rowKeys[i]]["DeviceError"]) {
                 //    DisableDevice(rowState[rowKeys[i]]);
                 //}
@@ -7619,13 +7719,24 @@
         }
 
 
-        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl) {
+        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl, isSmart) {
 
             var cardBody = parent.querySelector("[data-selector='Traps']");
             var row = document.createElement("div");
             if(iconUrl) {
                 const smartIcon = card.querySelector('[data-info="iconSmart"]');
                 smartIcon.src = iconUrl;
+            }
+            if(isSmart === "0") {
+                card.querySelector('[data-info="btnSmart"]').querySelector('.bi-arrow-counterclockwise').parentNode.style.display = "none";
+                const deviceInfo = card.querySelector('[data-section="DeviceInfo"]');
+                deviceInfo.querySelector('.PositionToggle').style.display = "none";
+                deviceInfo.children[4].style.display = "none";
+                deviceInfo.children[6].style.display = "none";
+                deviceInfo.children[7].style.display = "none";
+                deviceInfo.children[8].style.display = "none";
+                deviceInfo.children[2].children[2].style.display = "none";
+                deviceInfo.children[5].children[0].style.display = "none";
             }
             row.appendChild(card);
             row.setAttribute("data-id", id);
@@ -7921,16 +8032,24 @@
 
         }
 
+        function closeAllOpenDeviceCards() {
+            document.querySelector('tbody').querySelector('tr')
+                .querySelectorAll('div[data-id]').forEach(element => {
+                    element.querySelector('[data-section="clearScreen"]').style.setProperty("display", "none")
+                });
+        }
+
         function toggleSiteClearScreen(event) {
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
             const toggle = document.querySelector('.toggleSiteClearScreen');
             if(siteClearScreen.style.display === 'none') {
                 siteClearScreen.style.display = '';
                 toggle.classList.add('rotate');
+                closeAllOpenDeviceCards();
             } else {
                 siteClearScreen.style.display = 'none';
                 toggle.classList.remove('rotate');
-                siteBaitEnabledDevices = [];
+                siteSelectedDevices = [];
                 siteBaitEnabled = false;
                 document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
                     element.style.setProperty("display", "");

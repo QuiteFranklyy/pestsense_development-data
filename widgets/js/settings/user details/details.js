@@ -345,7 +345,6 @@ var accessNameComp = "no role";
 Script.on("load", load);
 var globalAmins;
 function load() {
-    console.log("HEY WE MADE A CHANGE YOU BASTARD");
     Database.readRecords("Directory", "users", (data) => {
         globalAmins = SensaCollection.load(data.value).getColumn("isglobaladmin");
         // console.log("Users global from the database are: " + JSON.stringify(globalAmins, null, 4));
