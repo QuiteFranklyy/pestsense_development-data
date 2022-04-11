@@ -534,8 +534,8 @@
                     Description:x.Description
                 }
                 loading += 2; // Add two for each device channel that has to be loaded.
-                fw.func("history", "PESTCO/RODENTS/" + x.Device.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", startDate, end);         // request data from server
-                fw.func("history", "PESTCO/RODENTS/" + x.Device.toUpperCase() + "/CYCLETOTAL", "CYCLETOTAL", startDate, end);         // request data from server
+                fw.func("history", "PESTCO/RODENTS/" + x.Device.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", x.startDate, end);         // request data from server
+                fw.func("history", "PESTCO/RODENTS/" + x.Device.toUpperCase() + "/CYCLETOTAL", "CYCLETOTAL", x.startDate, end);         // request data from server
 
             });
           

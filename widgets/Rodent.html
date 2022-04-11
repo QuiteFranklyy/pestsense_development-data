@@ -1506,6 +1506,34 @@
             background: #646c83;
         }
 
+        input[type='checkbox'].YesCheckbox::after {
+            -webkit-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
+            -moz-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
+            box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
+            background: #388b3d;
+        }
+
+        input[type='checkbox'].YesCheckbox:checked::after {
+            -webkit-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
+            -moz-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
+            box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
+            background: #388b3d;
+        }
+
+        input[type='checkbox'].NoCheckbox::after {
+            -webkit-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
+            -moz-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
+            box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
+            background: #d74423;
+        }
+
+        input[type='checkbox'].NoCheckbox:checked::after {
+            -webkit-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
+            -moz-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
+            box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
+            background: #d74423;
+        }
+
         input[type='checkbox'].small-checkbox:after {
             width: 28px;
             height: 28px;
@@ -1537,15 +1565,20 @@
             font-size: 28px;
         }
 
-        input[type="number"] {
+        /* input[type="number"] {
             -webkit-appearance: textfield;
             -moz-appearance: textfield;
             appearance: textfield;
-        }
+        } */
 
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
             -webkit-appearance: none;
+        }
+
+        input[type=number].number-input::-webkit-inner-spin-button,
+        input[type=number].number-input::-webkit-outer-spin-button {
+            -webkit-appearance: auto;
         }
 
         .number-input {
@@ -1590,6 +1623,19 @@
 
         .number-input button.plus:after {
             transform: translate(-50%, -50%) rotate(90deg);
+        }
+
+        input[type=number].number-input {
+            font-family: sans-serif;
+            max-width: 5rem;
+            border: none;
+            color: white;
+            background-color: #646c83;
+            border-width: 0 2px;
+            font-size: 22px;
+            height: 42px;
+            font-weight: bold;
+            text-align: center;
         }
 
         .number-input input[type=number] {
@@ -2588,6 +2634,56 @@
                                     CANCEL
                                 </a>
                                 <a data-button="submitButton" onclick="NoActivitySubmit(event)" class="selectBtn"
+                                    style="margin:0px;width:100%;">
+                                    SAVE
+                                </a>
+                            </div>
+                        </div>
+                        <div data-form="formObservation">
+                            <div style="padding: 0px 8px;">
+                                <h2 style="color:white; font-size: 15px;">OBSERVATION</h2>
+                                <div class="flex" style="justify-content: space-between; align-items: center;">
+                                    <label data-info="observationQ1">Bait Taken?</label>
+                                    <div style="display: flex;">
+                                        <span style="margin-right: 1rem; display: flex; flex-direction: column; align-items: center;">
+                                            <input type="checkbox" class="CustomCheckbox YesCheckbox" data-info="RepeatCheckbox"
+                                                name="baitTakenYes" style="border-radius:5px;" onchange="YesClicked(event)" />
+                                            <label style="padding: 0px; margin-top: 2px;">Yes</label>
+                                        </span>
+                                        <span style="display: flex; flex-direction: column; align-items: center;">
+                                            <input type="checkbox" class="CustomCheckbox NoCheckbox" data-info="RepeatCheckbox"
+                                                name="baitTakenNo" style="border-radius:5px;" onchange="NoClicked(event)" />
+                                            <label style="padding: 0px; margin-top: 2px;">No</label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 12px; display: none;">
+                                    <label data-info="observationQ2">How Much %?</label>
+                                    <input class="quantity number-input" min="0" data-info="qtyInput" value="10"
+                                        type="number" onchange="BaitPerChange(event)">
+                                </div>
+                                <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 12px; display: none;">
+                                    <label data-info="observationQ3">Added / Replaced Bait</label>
+                                    <div style="display: flex;">
+                                        <span style="margin-right: 1rem; display: flex; flex-direction: column; align-items: center;">
+                                            <input type="checkbox" class="CustomCheckbox YesCheckbox" data-info="RepeatCheckbox"
+                                               name="openAddBait" style="border-radius:5px;" onchange="YesClicked(event)" />
+                                            <label style="padding: 0px; margin-top: 2px;">Yes</label>
+                                        </span>
+                                        <span style="display: flex; flex-direction: column; align-items: center;">
+                                            <input type="checkbox" class="CustomCheckbox NoCheckbox" data-info="RepeatCheckbox"
+                                                style="border-radius:5px;" onchange="NoClicked(event)" />
+                                            <label style="padding: 0px; margin-top: 2px;">No</label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex" style="overflow: auto; margin-top:8px;  ">
+                                <a data-button="cancelButton" onclick="CancelObservation(event)" class="selectBtn"
+                                    style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                    CANCEL
+                                </a>
+                                <a data-button="submitButton" onclick="SubmitObservation(event)" class="selectBtn"
                                     style="margin:0px;width:100%;">
                                     SAVE
                                 </a>
@@ -5318,6 +5414,110 @@
 
         }
 
+        function AddObservation(event) {
+            var id = cardSelected.parentNode.getAttribute("data-id");
+            var form = cardSelected.querySelector("[data-section='formScreen']");
+            const actions = cardSelected.querySelector("[data-section='SmartDevice']");
+            form.style.setProperty("display", "");
+            actions.style.setProperty("display", "none");
+            var item = rowState[id];
+            cardSelected.querySelector("[data-form='formBait']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='formSet']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='formObservation']").style.setProperty("display", "");
+        }
+
+        function CancelObservation(event) {
+            var form = cardSelected.querySelector("[data-section='formScreen']");
+            const actions = cardSelected.querySelector("[data-section='SmartDevice']");
+            form.style.setProperty("display", "none");
+            actions.style.setProperty("display", "");
+            cardSelected.querySelector("[data-form='formBait']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='formSet']").style.setProperty("display", "none");
+            cardSelected.querySelector("[data-form='formObservation']").style.setProperty("display", "none");
+        }
+
+        function SubmitObservation(event) {
+            var id = cardSelected.parentNode.getAttribute("data-id");
+            const item = rowState[id];
+            const isChecked = cardSelected.querySelector('[data-info="observationQ1"]').parentNode.querySelector('input').checked;
+            const input = cardSelected.querySelector('[data-info="observationQ2"]').parentNode.querySelector('input');
+            if (isChecked) {
+                fw.fireEvent("EventTransaction", { ID: id, EventType: 4, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: item.CompanyProductId, Value: input.value });
+            } else {
+                fw.fireEvent("EventTransaction", { ID: id, EventType: 4, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: item.CompanyProductId, Value: '0' });
+            }
+            CancelObservation();
+            input.value=10;
+            event.target.parentNode.parentNode.querySelector('[data-info="RepeatCheckbox"][name="baitTakenYes"]').checked=false;
+            event.target.parentNode.parentNode.parentNode.querySelector("[data-form='formObservation']")
+                .querySelector('div').querySelectorAll('.flex')[1].style.display = 'none'
+            event.target.parentNode.parentNode.parentNode.querySelector("[data-form='formObservation']")
+                .querySelector('div').querySelectorAll('.flex')[2].style.display = 'none';
+            if(event.target.parentNode.parentNode.querySelector('[data-info="RepeatCheckbox"][name="openAddBait"]').checked){                
+            var baitButton = event.target.parentNode.parentNode.parentNode.parentNode.querySelector('[data-info="baitIcon"]');
+            baitButton.dispatchEvent(new Event('click'));
+            }
+        }
+
+        function  BaitPerChange(event) {
+            const remainder = parseInt(event.target.value) % 10;
+            const quotient = parseInt(event.target.value) / 10;
+            if(remainder == '1') {
+                if(event.target.value == '101') {
+                    event.target.value = 100;
+                } else {
+                    event.target.value = (parseInt(quotient) + 1) * 10;
+                }
+            } else {
+                if(parseInt(quotient)) {
+                    event.target.value = parseInt(quotient) * 10;
+                } else {
+                    event.target.value = 10;
+                }
+            }
+        }
+
+        function YesClicked(event) {
+            const noCheckBox = event.target.parentNode.parentNode.querySelectorAll('input')[1];
+            noCheckBox.checked = !event.target.checked;
+            const question2 = cardSelected.querySelector('[data-info="observationQ2"]');
+            const question3 = cardSelected.querySelector('[data-info="observationQ3"]');
+            if(event.target.name === 'baitTakenYes') {
+                if(!event.target.checked) {
+                    if(question2) question2.parentNode.style.display = 'none';
+                    if(question3) question3.parentNode.style.display = 'none';
+                } else {
+                    if(question2) question2.parentNode.style.display = '';
+                    if(question3) question3.parentNode.style.display = '';
+                }
+            }
+        }
+
+        function NoClicked(event) {
+            const yesCheckBox = event.target.parentNode.parentNode.querySelectorAll('input')[0];
+            yesCheckBox.checked = !event.target.checked;
+            if(event.target.name === 'baitTakenNo') {
+                if(event.target.checked) {
+                    cardSelected.querySelector("[data-form='formObservation']")
+                        .querySelector('div').querySelectorAll('.flex')[1].style.display = 'none'
+                    cardSelected.querySelector("[data-form='formObservation']")
+                        .querySelector('div').querySelectorAll('.flex')[2].style.display = 'none'
+                } else {
+                    cardSelected.querySelector("[data-form='formObservation']")
+                        .querySelector('div').querySelectorAll('.flex')[1].style.display = ''
+                    cardSelected.querySelector("[data-form='formObservation']")
+                        .querySelector('div').querySelectorAll('.flex')[2].style.display = ''
+                }
+                
+            }
+        }
+
         function AddSiteBait(current) {
             event.currentTarget.parentNode.parentNode.style.setProperty("display", "");
             document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
@@ -5393,7 +5593,8 @@
                 }
             }
             else if (deviceType.value === "1") {
-                fw.func("PUBLISHCLIENT", "GenericActionMessage", "GoTo|Provisioning Step 1");
+                var selectedModel=siteClearScreen.querySelector('[data-select="Device"]').selectedOptions[0].innerHTML;
+                fw.func("PUBLISHCLIENT", "GenericActionMessage", "GoTo|Provisioning Step 1|AddDevice|true|SelectedModel|"+selectedModel);
             }
         }
 
@@ -6102,7 +6303,12 @@
                         collection.data[parseInt(rowKeys[i])][baitEnabledIndex] ?
                             collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1',
                         iconUrl,
-                        modelType?.isSmart
+                        modelType?.isSmart,
+                        {
+                            question1: modelType.question1,
+                            question2: modelType.question2,
+                            question3: modelType.question3,
+                        }
                     );
                     rowState[rowKeys[i]] = {};
                     rowState[rowKeys[i]]["rowId"] = rowKeys[i];
@@ -6622,6 +6828,8 @@
                 //if (rowState[rowKeys[i]]["DeviceError"]) {
                 //    DisableDevice(rowState[rowKeys[i]]);
                 //}
+                var companyProductIdIndex = collection._columnMap.CompanyProductId;
+                rowState[rowKeys[i]]["CompanyProductId"] = collection.data[parseInt(rowKeys[i])][companyProductIdIndex];
             }
 
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
@@ -7969,7 +8177,7 @@
         }
 
 
-        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl, isSmart) {
+        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl, isSmart, questions) {
 
             var cardBody = parent.querySelector("[data-selector='Traps']");
             var row = document.createElement("div");
@@ -7987,6 +8195,25 @@
                 deviceInfo.children[8].style.display = "none";
                 deviceInfo.children[2].children[2].style.display = "none";
                 deviceInfo.children[5].children[0].style.display = "none";
+                card.querySelector('[data-info="btnSmart"]').querySelector('.bi-eye').parentNode.style.display = "";
+                card.querySelector('[data-info="btnSmart"]').querySelector('.bi-eye').setAttribute('onclick', 'AddObservation(event)');
+                if (questions) {
+                    if (questions.question1) {
+                        card.querySelector('[data-info="observationQ1"]').innerHTML = questions.question1;
+                    } else {
+                        card.querySelector('[data-info="observationQ1"]').parentNode.remove();
+                    }
+                    if (questions.question2) {
+                        card.querySelector('[data-info="observationQ2"]').innerHTML = questions.question2;
+                    } else {
+                        card.querySelector('[data-info="observationQ2"]').parentNode.remove();
+                    }
+                    if (questions.question3) {
+                        card.querySelector('[data-info="observationQ3"]').innerHTML = questions.question3;
+                    } else {
+                        card.querySelector('[data-info="observationQ3"]').parentNode.remove();
+                    }
+                }
             }
             row.appendChild(card);
             row.setAttribute("data-id", id);
