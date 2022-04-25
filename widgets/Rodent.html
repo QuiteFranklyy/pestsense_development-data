@@ -3233,6 +3233,8 @@
                     "SetModelTypes": setModelTypes,
                     "SetModels": setModels,
                     "SetApplicationSettings": setApplicationSettings,
+                    "set timewindow dates": setTimeWindowDates,
+                    "toggle time window filter": toggleTimeWindowFilter
                 },
                 outputEvents:
                     [
@@ -3369,6 +3371,9 @@
         var models = [];
         var filteredModels = [];
         var applicationSettings = {};
+        var timeWindowEnabled = false;
+        var timeWindowStartDate;
+        var timeWindowEndDate;
 
         Date.prototype.addDays = function (days) {
             var date = new Date(this.valueOf());
@@ -4677,11 +4682,12 @@
 
         function submitSiteTrap() {
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+            const baitType = siteClearScreen.querySelector("[data-select='BaitType']").value;
             siteSelectedDevices.forEach(id => {
                 const card = document.querySelector(`[data-id="${id}"]`);
                 cardSelected = card.firstChild;
-                card.querySelector("[data-select='BaitType']").innerHTML = `<option>${siteClearScreen.querySelector("[data-select='BaitType']").value}</option>`
-                card.querySelector("[data-select='BaitType']").value = siteClearScreen.querySelector("[data-select='BaitType']").value;
+                card.querySelector("[data-select='BaitType']").innerHTML = `<option>${baitType}</option>`
+                card.querySelector("[data-select='BaitType']").value = baitType;
                 card.querySelector("[data-info='qtyInput']").value = siteClearScreen.querySelector("[data-info='qtyInput']").value;
                 card.querySelector("[data-value='QtyLabel']").innerHTML = siteClearScreen.querySelector("[data-value='QtyLabel']").innerHTML;
                 card.querySelector("[data-info='expiryDate']").value = siteClearScreen.querySelector("[data-info='expiryDate']").value;
@@ -5761,11 +5767,11 @@
         }
 
         function CancelBait(current) {
-
-            current.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.setProperty("display", "none");
-            event.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
-            cardSelected.querySelector("[data-section='clearScreen']").querySelector("[data-section='Actions']").querySelector("[data-section='ordinaryFormBtn']").style.setProperty("display", "");
-
+            if(current) {
+                current.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.setProperty("display", "none");
+                event.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
+                cardSelected.querySelector("[data-section='clearScreen']").querySelector("[data-section='Actions']").querySelector("[data-section='ordinaryFormBtn']").style.setProperty("display", "");
+            }
         }
 
         function CancelSiteBait(current) {
@@ -5797,6 +5803,71 @@
             siteClearScreen.querySelector('[data-input="deviceQuantity"]').value = 1;
             siteClearScreen.querySelector('[data-select="DeviceType"]').value = modelTypes[0].id;
             ModelTypeChanged(siteClearScreen.querySelector('[data-select="DeviceType"]'));
+        }
+
+        function toggleTimeWindowFilter(data) {
+            if (data.value == 1) {
+                enableTimeWindowFilter();
+            } else {
+                disableTimeWindowFilter();
+            }
+            if(cardSelected) {
+                var id = cardSelected.parentNode.getAttribute("data-id");
+                BindChartData(rowState[id].DeviceNumber);
+            }
+        }
+
+        /**
+         * function to disable the time window filtering.
+         */ 
+        function disableTimeWindowFilter() {
+            timeWindowEnabled = false;
+        }
+
+        /** 
+         * function to enable the time window filtering.
+         */ 
+        function enableTimeWindowFilter() {
+            timeWindowEnabled = true;
+        }
+
+        /**
+         * 
+         */ 
+        function setTimeWindowDates(eventData) {
+            var values = eventData.value.split(",");
+            var start = [];                                             // container for date params
+            var end = [];
+            // we are getting start/end dates with relevant times
+            values[0].split('-').forEach(function (item) {
+                start.push(parseInt(item));
+            });
+
+            values[1].split(':').forEach(function (item) {
+                start.push(parseInt(item));
+            });
+
+            var end = [];
+            values[2].split('-').forEach(function (item) {
+                end.push(parseInt(item));
+            });
+
+            values[3].split(':').forEach(function (item) {
+                end.push(parseInt(item));
+            });
+
+            timeWindowStartDate = new Date(Date.UTC(start[0], start[1] - 1, start[2], start[3], start[4], start[5], 0)).getTime();
+            timeWindowEndDate = new Date(Date.UTC(end[0], end[1] - 1, end[2], end[3], end[4], end[5], 0)).getTime();
+
+            if (!isNaN(timeWindowStartDate && !isNaN(timeWindowEndDate))) {
+                var id = cardSelected.parentNode.getAttribute("data-id");
+                BindChartData(rowState[id].DeviceNumber);
+            } else {
+                fw.status({
+                    message: "INFO - Invalid Date and time entries (NaN). Format required yyyy-mm-dd"
+                });
+                Log.warn("Invalid Date and time entries (NaN). Format required yyyy-mm-dd");
+            }
         }
 
         function ShowAdvisories(event) {
@@ -7117,11 +7188,27 @@
                 endDate = new Date(endDate).toISOString();
                 startDate = startDate.toISOString();
 
-                fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/WEIGHT", "WEIGHT", endDate, startDate);         // request data from server
-                fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", endDate, startDate);         // request data from server
-                fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/COUNTERTOTAL", "COUNTERTOTAL", endDate, startDate);         // request data from server
-                fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLELEFT", "ACTIVECYCLELEFT", endDate, startDate);
-                fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLERIGHT", "ACTIVECYCLERIGHT", endDate, startDate);
+                if(timeWindowEnabled) {
+                    if(new Date(timeWindowStartDate) < new Date(endDate)) {
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/WEIGHT", "WEIGHT", new Date(timeWindowStartDate).toISOString(), startDate);         // request data from server
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", new Date(timeWindowStartDate).toISOString(), startDate);         // request data from server
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/COUNTERTOTAL", "COUNTERTOTAL", new Date(timeWindowStartDate).toISOString(), startDate);         // request data from server
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLELEFT", "ACTIVECYCLELEFT", new Date(timeWindowStartDate).toISOString(), startDate);
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLERIGHT", "ACTIVECYCLERIGHT", new Date(timeWindowStartDate).toISOString(), startDate);
+                    } else {
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/WEIGHT", "WEIGHT", endDate, startDate);         // request data from server
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", endDate, startDate);         // request data from server
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/COUNTERTOTAL", "COUNTERTOTAL", endDate, startDate);         // request data from server
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLELEFT", "ACTIVECYCLELEFT", endDate, startDate);
+                        fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLERIGHT", "ACTIVECYCLERIGHT", endDate, startDate);
+                    }
+                } else {
+                    fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/WEIGHT", "WEIGHT", endDate, startDate);         // request data from server
+                    fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", endDate, startDate);         // request data from server
+                    fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/COUNTERTOTAL", "COUNTERTOTAL", endDate, startDate);         // request data from server
+                    fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLELEFT", "ACTIVECYCLELEFT", endDate, startDate);
+                    fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/ACTIVECYCLERIGHT", "ACTIVECYCLERIGHT", endDate, startDate);
+                }
             }
         }
 

@@ -45,6 +45,16 @@
             background-color: rgba(245, 129, 51);
         }
 
+        .container input[type="checkbox"]:checked ~ .checkmark.green {
+            background-color: #468847;
+            border-color: #468847;
+        }
+
+        .container input[type="checkbox"]:checked ~ .checkmark.red {
+            background-color: #b94a48;
+            border-color: #b94a48;
+        }
+
         /* Create the checkmark/indicator (hidden when not checked) */
         .checkmark:after {
             content: "";
@@ -359,7 +369,8 @@
                     "change scope": changeScope,
                     "receive value": receiveValue,
                     "set country": setCountry,
-                    "set validity message": setValidityMessage
+                    "set validity message": setValidityMessage,
+                    "change checkbox color": changeCheckboxColor
                 },
                 outputEvents: [
                     "on change",
@@ -610,6 +621,26 @@
         function setValidityMessage(eventData) {
             textInput.setCustomValidity(eventData.value);
             textInput.reportValidity();
+        }
+
+        /**
+         * Changes the color for input type checkbox.
+         */
+        function changeCheckboxColor(eventData) {
+            const checkmark = document.querySelector('.checkmark');
+            if(checkmark) {
+                if(eventData.value) {
+                    if(eventData.value === 'red') {
+                        checkmark.classList.add('red');
+                    }
+                    if(eventData.value === 'green') {
+                        checkmark.classList.add('green');
+                    }
+                } else {
+                    checkmark.classList.remove('red');
+                    checkmark.classList.remove('green');
+                }
+            }
         }
 
         /**

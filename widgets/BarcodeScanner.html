@@ -97,7 +97,8 @@
             },
             clientEvents: {
                 inputEvents: {
-                    "activate": activateScanner
+                    "activate": activateScanner,
+                    "deactivate": stopBarcodeReader
                 },
                 outputEvents: [
                     "Detected",
@@ -186,7 +187,7 @@
         }
 
         function StartScanner(index, devices) {
-            const html5QrcodeScanner = new Html5Qrcode(/* element id */ "widget");
+            html5QrcodeScanner = new Html5Qrcode(/* element id */ "widget");
 
             var cameraId = devices[index].id;
             // .. use this to start scanning
@@ -221,8 +222,7 @@
         }
 
         function stopBarcodeReader() {
-
-
+            html5QrcodeScanner.stop();
         }
 
         // API actions for dashboard mode
