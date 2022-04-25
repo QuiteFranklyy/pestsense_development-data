@@ -3291,6 +3291,13 @@
 
         // enum type object to remove magic numbers for card state - State is the red, yellow, green, grey colour of the card
         const CardState = { NonSmart: 0, UrgentRed: 4, ImportantYellow: 3, NormalGreen: 2, DeactivatedGrey: 1, Unassigned: 5 };
+
+        var CardStateUnderlineColor = {};
+        CardStateUnderlineColor[CardState.UrgentRed] = "UnderlineRed";
+        CardStateUnderlineColor[CardState.ImportantYellow] = "UnderlineOrange";
+        CardStateUnderlineColor[CardState.NormalGreen] = "UnderlineGreen";
+        CardStateUnderlineColor[CardState.DeactivatedGrey] = "UnderlineGray";
+
         // status is whether the device is enabled or disabled.
         const CardStatus = { Disabled: 0, Enabled: 1 };
 
@@ -4420,6 +4427,8 @@
                 Database.cudParam("Rodent", "Devices", paramUpdateDevices, function (data) {
                 });
                 cardSelected.querySelector("[data-info='deviceErrorStatus']").style.setProperty("display", "none");
+                rowState[id]["DeviceError"] = false;
+                recalculateDeviceState(id);
 
             }
         }
@@ -4660,10 +4669,15 @@
                 return;
             }
 
-            cardSelected.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGreen");
-            cardSelected.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGreen");
-            cardSelected.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
-            cardSelected.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGreen");
+            // cardSelected.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGreen");
+            // cardSelected.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGreen");
+            // cardSelected.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
+            // cardSelected.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGreen");
+
+            rowState[id]["Lozenge1"] = CardState.NormalGreen;
+            rowState[id]["Lozenge2"] = CardState.NormalGreen;
+            rowState[id]["Lozenge3"] = CardState.NormalGreen;
+            rowState[id]["Lozenge4"] = CardState.NormalGreen;
 
             setDeviceStatus(id);
             ChangeHeaderValue();
@@ -5887,7 +5901,7 @@
             }
             if (value > 5 || value < 0) {
 
-                throw new Error("State value must either 0, 1, 2, 4. Found " + value);
+                throw new Error("State value must either 0, 1, 2, 3, 4. Found " + value);
             }
 
             var card = rowElems[id];
@@ -6333,6 +6347,8 @@
          * The columns available are: technician, trapType, temp, setTime, updateTime, triggeredTime.
          *
          * Anything with data-value will automaticcally have the value updated in .innerHTML. From items etc neet to use the second switch statement.
+         * 
+         * 25-04-22 removed the underlining of various attributes, this has been moved to the lozenge values.
          *
          * @param packet
          */
@@ -6424,16 +6440,16 @@
                                     switch (parseInt(collection.data[rowKeys[i]][j])) {
                                         case 1:
 
-                                            card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineOrange");
+                                            //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineOrange");
                                             rowState[rowKeys[i]]["ConsumptionStatus"] = 1;
                                             break;
                                         case 2:
 
-                                            card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineRed");
+                                            //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineRed");
                                             rowState[rowKeys[i]]["ConsumptionStatus"] = 2;
                                             break;
                                         default:
-                                            card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
+                                            //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
 
                                             break;
                                     }
@@ -6454,7 +6470,7 @@
                             case "Hours":
                                 if (collection.data[rowKeys[i]][j] !== "") {
 
-                                    card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGray")
+                                    //card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGray")
 
                                     card.querySelector("[data-value='Hours']").innerHTML = collection.data[rowKeys[i]][j];
                                     //SetCardLineColor(card, , triggerTresholdUpper, triggerTreshold, "UnderlineHours");
@@ -6463,16 +6479,16 @@
 
 
                                     if (parseVal > triggerTresholdUpper) {
-                                        card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineRed")
+                                        //card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineRed")
                                     }
                                     else if (parseVal >= triggerTreshold && parseVal <= triggerTresholdUpper) {
-                                        card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineOrange")
+                                        //card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineOrange")
                                     }
                                     else if (parseVal < 0) {
-                                        card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGray")
+                                        //card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGray")
                                     }
                                     else {
-                                        card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGreen")
+                                        //card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGreen")
                                     }
 
 
@@ -6481,7 +6497,7 @@
                                 } else {
                                     card.querySelector("[data-value='Hours']").innerHTML = "--";
                                     //SetCardLineColor(card, 0, 40, "UnderlineHours");
-                                    card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGray")
+                                    //card.querySelector("[data-info='UnderlineHours']").setAttribute("class", "UnderlineGray")
 
 
                                 }
@@ -6612,7 +6628,7 @@
                                 }
                                 else {
                                     //card.querySelector("[data-value='Dial']").innerHTML = "--";
-                                    card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
+                                    //card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
 
                                 }
                                 break;
@@ -6657,13 +6673,14 @@
                                 // fix an issue with the communication error not displaying. These changes will be ovewritten
                                 // on the next production push
                                 if (collection.data[rowKeys[i]][j] !== "") {
-                                    if (collection.data[rowKeys[i]][j] === "1" && collection.data[rowKeys[i]][20] === "1") {
+                                    if (collection.data[rowKeys[i]][j] === "1") {
                                         card.querySelector("[data-info='communicationErrorStatus']").style.setProperty("display", "");
                                         rowState[rowKeys[i]]["CommunicationError"] = true;
 
                                     }
-                                    else if (collection.data[rowKeys[i]][j] === "0" && collection.data[rowKeys[i]][20] === "1") {
+                                    else if (collection.data[rowKeys[i]][j] === "0") {
                                         card.querySelector("[data-info='communicationErrorStatus']").style.setProperty("display", "none");
+                                        rowState[rowKeys[i]]["CommunicationError"] = false;
                                     }
                                     else if (collection.data[rowKeys[i]][j] === "2") {
                                         card.querySelector("[data-info='communicationErrorStatus']").style.setProperty("display", "");
@@ -6756,26 +6773,26 @@
                                         const diffTime = foodDate - date
                                         if (isNaN(diffTime)) {
                                             card.querySelector("[data-value='Duration']").innerHTML = "--";
-                                            card.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGray");
+                                            //card.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGray");
                                         }
                                         else {
                                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                                             var remaining = diffDays.toString() + "d";
                                             card.querySelector("[data-value='Duration']").innerHTML = remaining;
                                             if (foodItem !== undefined) {
-                                                SetCardLineColor(card, diffDays, parseInt(foodItem.LowerThreshold), parseInt(foodItem.UpperThreshold), "UnderlineDuration");
+                                                //SetCardLineColor(card, diffDays, parseInt(foodItem.LowerThreshold), parseInt(foodItem.UpperThreshold), "UnderlineDuration");
                                             }
                                         }
 
                                     }
                                     else {
                                         card.querySelector("[data-value='Duration']").innerHTML = "--";
-                                        card.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGray");
+                                        //card.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGray");
                                     }
                                 }
                                 else if (collection.data[rowKeys[i]][j] === '') {
                                     card.querySelector("[data-value='Duration']").innerHTML = "--";
-                                    card.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGray");
+                                    //card.querySelector("[data-info='UnderlineDuration']").setAttribute("class", "UnderlineGray");
                                 }
                                 rowState[rowKeys[i]]["Duration"] = collection.data[rowKeys[i]][j];
                                 break;
@@ -6787,20 +6804,20 @@
                                     rowState[rowKeys[i]]["WeightConsumed"] = collection.data[rowKeys[i]][j];
                                     card.querySelector("[data-value='Consumed']").innerHTML = Math.round(parseFloat((collection.data[rowKeys[i]][j]))) + "g";
                                     if (rowState[rowKeys[i]]["ConsumptionStatus"] === undefined) {
-                                        card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
+                                        //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
                                     }
                                     else {
                                         switch (rowState[rowKeys[i]]["ConsumptionStatus"]) {
                                             case 1:
-                                                card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineOrange");
+                                                //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineOrange");
 
                                                 break;
                                             case 2:
-                                                card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineRed");
+                                                //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineRed");
 
                                                 break;
                                             default:
-                                                card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
+                                                //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineGreen");
 
                                                 break;
                                         }
@@ -6821,7 +6838,7 @@
                                 if (collection.data[rowKeys[i]][j] !== "") {
 
                                     card.querySelector("[data-value='Dial']").innerHTML = Math.round(parseFloat(collection.data[rowKeys[i]][j])) + "%";
-                                    SetCardLineColor(card, collection.data[rowKeys[i]][j], baitThreshold, baitThresholdUpper, "UnderlineBait");
+                                    //SetCardLineColor(card, collection.data[rowKeys[i]][j], baitThreshold, baitThresholdUpper, "UnderlineBait");
 
                                     rowState[rowKeys[i]]["CalculatedWeight"] = collection.data[rowKeys[i]][j];
                                 }
@@ -6851,11 +6868,11 @@
                                     rowState[rowKeys[i]]["EnteredWeight"] = collection.data[rowKeys[i]][j];
                                     var weightConsumedAmmount = ((rowState[rowKeys[i]]["WeightConsumed"] / Math.round(parseFloat(collection.data[rowKeys[i]][j]) - BarCompensation)));
                                     if (weightConsumedAmmount > 10 && weightConsumedAmmount < 15) {
-                                        card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineYellow");
+                                        //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineYellow");
 
                                     }
                                     else if (weightConsumedAmmount > 15) {
-                                        card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineRed");
+                                        //card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class", "UnderlineRed");
                                     }
                                 }
                                 else {
@@ -6878,24 +6895,41 @@
                                 if (collection.data[rowKeys[i]][j] !== "") {
                                     rowState[rowKeys[i]]["PacketType"] = collection.data[rowKeys[i]][j];
                                     if (collection.data[rowKeys[i]][j] === "1") {
-                                        card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
+                                        //card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
                                         //      card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class","UnderlineGray");
                                     }
                                 }
                                 else {
                                     rowState[rowKeys[i]]["PacketType"] = -1;
                                     if (collection.data[rowKeys[i]][j] === "1") {
-                                        card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
+                                        //card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
                                         //  card.querySelector("[data-info='UnderlineBaitTaken']").setAttribute("class","UnderlineGray");
                                     }
                                 }
                                 break;
 
+                            case "Lozenge1":
+                                rowState[rowKeys[i]]["Lozenge1"] = collection.data[rowKeys[i]][j];
+                                console.log(rowState[rowKeys[i]]["Lozenge1"]);
+                                break;
+
+                            case "Lozenge2":
+                                rowState[rowKeys[i]]["Lozenge2"] = collection.data[rowKeys[i]][j];
+                                break;
+
+                            case "Lozenge3":
+                                rowState[rowKeys[i]]["Lozenge3"] = collection.data[rowKeys[i]][j];
+                                break;
+
+                            case "Lozenge4":
+                                rowState[rowKeys[i]]["Lozenge4"] = collection.data[rowKeys[i]][j];
+                                break;
                         }
                     }
                 }
                 if (collection.data[rowKeys[i]][4] != "0")
-                    setDeviceStatus(rowKeys[i]);
+                    //setDeviceStatus(rowKeys[i]);
+                    setLozengeColors(rowKeys[i]);
                 //if (rowState[rowKeys[i]]["DeviceError"]) {
                 //    DisableDevice(rowState[rowKeys[i]]);
                 //}
@@ -6924,17 +6958,71 @@
 
 
         function DisableDevice(data) {
+            var id = 1;
+            rowState[id]["Lozenge1"] = CardState.DeactivatedGrey;
+            rowState[id]["Lozenge2"] = CardState.DeactivatedGrey;
+            rowState[id]["Lozenge3"] = CardState.DeactivatedGrey;
+            rowState[id]["Lozenge4"] = CardState.DeactivatedGrey;
+
+            rowState[id]["Status"] = CardState.DeactivatedGrey;
+
             card.querySelector("[data-value='Duration']").innerHTML = "--";
-            card.querySelector("[data-info='UnderlineBattery']").setAttribute("class", "UnderlineGray");
+            //card.querySelector("[data-info='UnderlineBattery']").setAttribute("class", "UnderlineGray");
             card.querySelector("[data-value='Dial']").innerHTML = "--";
-            card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
+            //card.querySelector("[data-info='UnderlineBait']").setAttribute("class", "UnderlineGray");
             card.querySelector("[data-value='FoodName']").innerHTML = "--";
 
-            setState(1, CardState.DeactivatedGrey);
+            setDeviceStatus(id);
         }
+
+
+        function setLozengeColors(id) {
+            var card = rowElems[id];
+            SetCardLineColorNoThreshold(card, rowState[id]["Lozenge1"], "UnderlineBait");
+            SetCardLineColorNoThreshold(card, rowState[id]["Lozenge2"], "UnderlineBaitTaken");
+            SetCardLineColorNoThreshold(card, rowState[id]["Lozenge3"], "UnderlineHours");
+            SetCardLineColorNoThreshold(card, rowState[id]["Lozenge4"], "UnderlineDuration");
+
+        }
+
+        function saveLozengeColors(id) {
+            var record = {
+                Id: id,
+                Lozenge1: rowState[id]["Lozenge1"],
+                Lozenge2: rowState[id]["Lozenge2"],
+                Lozenge3: rowState[id]["Lozenge3"],
+                Lozenge4: rowState[id]["Lozenge4"]
+            };
+
+            var dbVal = {};
+            dbVal[id] = record;
+            Database.saveRecordParam("Rodent", "Devices", dbVal);
+            console.log("Saved lozenge record");
+        }
+
+        // recalculates the device state in cases where the rodent widget updates something such as device error flag
+        function recalculateDeviceState(id) {
+            debugger;
+            console.log("Recalculating device state");
+            var communicationError = rowState[id]["CommunicationError"];
+            var deviceError = rowState[id]["DeviceError"];
+            var maxLozengeValue = Math.max(rowState[id]["Lozenge1"], rowState[id]["Lozenge2"], rowState[id]["Lozenge3"], rowState[id]["Lozenge4"]);
+
+            if (communicationError || deviceError) {
+                setState(id, CardState.UrgentRed);
+            } else {
+                setState(id, maxLozengeValue);
+            }
+        }
+
 
         // set the Device Status and State
         function setDeviceStatus(id) {
+            console.log("Setting device status");
+            setState(id, rowState[id]["State"]);
+            saveLozengeColors(id);
+            setLozengeColors(id);
+            /*
             rowState[id]["exiperyRisen"] = false;
             var prevStatus = rowState[id]["sstatus"];
             var foodItem;
@@ -7061,7 +7149,7 @@
                 setState(id, CardState.UrgentRed);
                 return;
             }
-
+            */
         }
 
 
@@ -7985,6 +8073,19 @@
             card.querySelector("[data-info='iconSmart']").style.setProperty("display", "none");
         }
 
+
+
+
+        function SetCardLineColorNoThreshold(card, colorValue, querySelector) {
+            debugger;
+
+            colorValue = parseInt(colorValue);
+            if (colorValue != 1 && colorValue != 2 && colorValue != 3 && colorValue != 4 || isNaN(colorValue)){
+                colorValue = 1;
+            }
+            card.querySelector("[data-info='" + querySelector + "']").setAttribute("class", CardStateUnderlineColor[colorValue]);
+        }
+
         function SetCardLineColor(card, value, treshold, tresholdUpper, querySelector) {
             card.querySelector("[data-info='" + querySelector + "']").setAttribute("class", "UnderlineGray")
 
@@ -8567,16 +8668,16 @@
                                 var updatedVal = CheckRowStateManul(diffDays, parseInt(foodItem.LowerThreshold), parseInt(foodItem.UpperThreshold), id);
                                 // if the updated val has a higher priority, then update the state value
                                 if (isHigherUrgency(sidebarStateVal, updatedVal)) {
-                                    setState(id, updatedVal);
+                                    //setState(id, updatedVal);
                                 }
                                 else {
                                     switch (sidebarStateVal) {
                                         case CardState.ImportantYellow:
-                                            setState(id, CardState.ImportantYellow);
+                                            //setState(id, CardState.ImportantYellow);
 
                                             break;
                                         case CardState.UrgentRed:
-                                            setState(id, CardState.UrgentRed);
+                                            //setState(id, CardState.UrgentRed);
 
                                             break;
                                     }
