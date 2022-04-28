@@ -2837,7 +2837,7 @@
                                                 Add Bait
                                             </a>-->
                                         </div>
-                                        <div class="flexItem">
+                                        <div class="flexItem" style="visibility: hidden;">
                                             <!--<a href="#" class="selectBtn fullWidth" data-button="noActivityBtn" onclick="NoActivity(event)">
                                                 No Activity
                                             </a>-->
@@ -2850,7 +2850,7 @@
                                             </svg>
                                             <p style="color:#4d98c2ff;" class="fixMargin">OBSERVATION</p>
                                         </div>
-                                        <div class="flexItem">
+                                        <div class="flexItem" style="visibility: hidden;">
                                             <!--<a href="#" class="selectBtn fullWidth" data-button="resetIR">
                                                 Reset Motion Count
                                             </a>-->
@@ -2863,7 +2863,7 @@
                                         </div>
                                     </div>
                                     <div class="row flex flexItemHolder">
-                                        <div class="flexItem">
+                                        <div class="flexItem" style="visibility: hidden;">
 
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 fill="currentColor" class="bi bi-arrow-bar-down iconGrid"
@@ -5171,6 +5171,18 @@
                 RemoveDevice();
             });
             ResetSiteIRCancel();
+            if(document.querySelectorAll('tbody tr > div').length === 1) {
+                const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
+                siteClearScreen.querySelector('.bi-arrow-bar-down').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-arrow-bar-down').parentNode.style.opacity = '0.3';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').parentNode.style.opacity = '0.3';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').removeAttribute('onclick');
+                siteClearScreen.querySelector('.bi-plus-circle').style.cursor = 'default';
+                siteClearScreen.querySelector('.bi-plus-circle').style.pointerEvents = 'none';
+                siteClearScreen.querySelector('.bi-plus-circle').parentNode.style.opacity = '0.3';
+                siteClearScreen.querySelector('.bi-plus-circle').removeAttribute('onclick');
+            }
         }
 
         function RemoveDevice() {
@@ -5234,7 +5246,7 @@
 
             });
 
-            cardSelected.remove();
+            cardSelected.parentNode.remove();
             fw.fireEvent("EventTransaction", { ID: id, EventType: 2, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: "", Value: "" });
             fw.fireEvent("UpdateTimeWindow", { id });
             cardSelected.querySelector("[data-section='clearScreen']").style.setProperty("display", "none");
@@ -5708,6 +5720,7 @@
             screenForm.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
             screenForm.querySelector("[data-form='noActivity']").style.setProperty("display", "none");
             screenForm.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
+            screenForm.querySelector("[data-form='formObservation']").style.setProperty("display", "none");
             screenForm.querySelector("[data-form='formSet']").style.setProperty("display", "none");
 
             baitChanged();
@@ -5873,7 +5886,7 @@
             timeWindowStartDate = new Date(Date.UTC(start[0], start[1] - 1, start[2], start[3], start[4], start[5], 0)).getTime();
             timeWindowEndDate = new Date(Date.UTC(end[0], end[1] - 1, end[2], end[3], end[4], end[5], 0)).getTime();
 
-            if (!isNaN(timeWindowStartDate && !isNaN(timeWindowEndDate))) {
+            if (!isNaN(timeWindowStartDate) && !isNaN(timeWindowEndDate) && cardSelected != undefined) {
                 var id = cardSelected.parentNode.getAttribute("data-id");
                 BindChartData(rowState[id].DeviceNumber);
             } else {
@@ -6943,11 +6956,24 @@
                 siteClearScreen.querySelector('.bi-arrow-bar-down').parentNode.style.opacity = '0.3';
                 siteClearScreen.querySelector('.bi-arrow-bar-up').style.cursor = 'default';
                 siteClearScreen.querySelector('.bi-arrow-bar-up').parentNode.style.opacity = '0.3';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').removeAttribute('onclick');
+            } else {
+                siteClearScreen.querySelector('.bi-arrow-bar-down').style.cursor = 'pointer';
+                siteClearScreen.querySelector('.bi-arrow-bar-down').parentNode.style.opacity = '1';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').style.cursor = 'pointer';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').parentNode.style.opacity = '1';
+                siteClearScreen.querySelector('.bi-arrow-bar-up').setAttribute('onclick', 'StartSiteRemove(event)');
             }
             if (!baitEnalbed) {
                 siteClearScreen.querySelector('.bi-plus-circle').style.cursor = 'default';
                 siteClearScreen.querySelector('.bi-plus-circle').style.pointerEvents = 'none';
                 siteClearScreen.querySelector('.bi-plus-circle').parentNode.style.opacity = '0.3';
+                siteClearScreen.querySelector('.bi-plus-circle').removeAttribute('onclick');
+            } else {
+                siteClearScreen.querySelector('.bi-plus-circle').style.cursor = 'pointer';
+                siteClearScreen.querySelector('.bi-plus-circle').style.pointerEvents = '';
+                siteClearScreen.querySelector('.bi-plus-circle').parentNode.style.opacity = '1';
+                siteClearScreen.querySelector('.bi-plus-circle').setAttribute('onclick', 'AddSiteBait(event)');
             }
             fw.fireEvent("children populated", 0);
 
