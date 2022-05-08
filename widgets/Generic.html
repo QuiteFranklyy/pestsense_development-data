@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Generic Widget</title>
     <link rel="preload" href="../fonts/OpenSans400.woff2" as="font" crossorigin="anonymous">
@@ -18,14 +19,14 @@
             user-select: none;
         }
 
-            /* Hide the browser's default checkbox */
-            .container input {
-                position: absolute;
-                opacity: 0;
-                cursor: pointer;
-                height: 0;
-                width: 0;
-            }
+        /* Hide the browser's default checkbox */
+        .container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
 
 
 
@@ -39,7 +40,7 @@
         }
 
 
-/* 
+        /* 
         @font-face {
             font-family: "Open Sans";
             font-style: normal;
@@ -49,23 +50,29 @@
         } */
 
         .flex {
-            display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6, BB7 */
-            display: -ms-flexbox; /* TWEENER - IE 10 */
-            display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
-            display: flex; /* NEW, Spec - Firefox, Chrome, Opera */
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+            display: -ms-flexbox;
+            /* TWEENER - IE 10 */
+            display: -webkit-flex;
+            /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+            display: flex;
+            /* NEW, Spec - Firefox, Chrome, Opera */
             width: 100%;
         }
 
         .activeText {
             color: #4d98c2ff;
-             word-break: break-all;
+            word-break: break-all;
         }
     </style>
 </head>
+
 <body id="body">
     <div id="group">
 
-        <div id="widget" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; z-index: 100; overflow:hidden;">
+        <div id="widget"
+            style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; z-index: 100; overflow:hidden;">
 
         </div>
     </div>
@@ -105,7 +112,10 @@
                     "set action": setAction,
                     "manage map": manageMap,
                     "toggle element visibility": toggleElementVisibility,
-                    "click floor map toggle": clickFloorMapToggle
+                    "click floor map toggle": clickFloorMapToggle,
+                    "open sidebar": openSidebar,
+                    "load search items": loadSearchItems,
+                    "set filters": setFilters
                 },
                 outputEvents: [
                     "EditCard",
@@ -138,7 +148,8 @@
 
         var cardSelected;
         var editMapValue = 0;
-
+        var searchType = 'Cards';
+        var searchQuery = '';
 
         /**
         * Handles a generic action, routes it back to the controller action handler for functional implementation
@@ -179,7 +190,7 @@
                         return;
                     }
                     target.style.setProperty("display", "");
-                     
+
                     fw.func("SETPROPERTY", fw.widgetName, "z-index", "130");
                     break;
                 case "Hide":
@@ -347,7 +358,7 @@
         }
         //End of temporary
         function CahngeMaitnanceMode(eventData) {
-             
+
 
             var toggle = eventData.querySelector('[data-value="maitnanceSelect"]');
             var currentClass = toggle.classList[0]
@@ -359,13 +370,14 @@
             }
         }
         function ChangeActiveMode(eventData) {
-             if (eventData.value === "All") {
+            if (eventData.value === "All") {
                 handleGeneric(`FilterFor|All`);
-             }
-             else {
+            } else if (eventData.value === "Omit No Activity") {
+                handleGeneric(`FilterFor|Omit`);
+            } else {
                 handleGeneric(`FilterFor|Active`);
-             }
-         }
+            }
+        }
         function ChangeSort(eventData) {
             if (eventData.value === "Sort By Station Id") {
                 fw.func("PUBLISHCLIENT", "SortBy", {
@@ -381,10 +393,55 @@
         /**
         * Manage how the map is being controlled.
         */
-        function manageMap(event){
+        function manageMap(event) {
 
             editMapValue = parseInt(event.value);
             console.log("Map edit in the generic is " + editMapValue);
+        }
+
+        function toggleFullScreen(elem) {
+            // ## The below if statement seems to work better ## if ((window.top.document.fullScreenElement && window.top.document.fullScreenElement !== null) || (window.top.document.msfullscreenElement && window.top.document.msfullscreenElement !== null) || (!window.top.document.mozFullScreen && !window.top.document.webkitIsFullScreen)) {
+            if (
+                (window.top.document.fullScreenElement !== undefined &&
+                    window.top.document.fullScreenElement === null) ||
+                (window.top.document.msFullscreenElement !== undefined &&
+                    window.top.document.msFullscreenElement === null) ||
+                (window.top.document.mozFullScreen !== undefined && !window.top.document.mozFullScreen) ||
+                (window.top.document.webkitIsFullScreen !== undefined && !window.top.document.webkitIsFullScreen)
+            ) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.webkitRequestFullScreen) {
+                    elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                if (window.top.document.cancelFullscreen) {
+                    window.top.document.cancelFullscreen();
+                } else if (window.top.document.mozCancelFullScreen) {
+                    window.top.document.mozCancelFullScreen();
+                } else if (window.top.document.webkitCancelFullScreen) {
+                    window.top.document.webkitCancelFullScreen();
+                } else if (window.top.document.msExitFullscreen) {
+                    window.top.document.msExitFullscreen();
+                }
+            }
+        }
+
+        function openFloorMap(event) {
+            event.stopPropagation();
+            fw.func("PUBLISHCLIENT", "mapFullScreen", {});
+            fw.func("TOGGLESIDEBAR", true);
+            fw.func("PUBLISHCLIENT", "openPhoneMap", {});
+            toggleFullScreen(window.top.document.body);
+        }
+
+        function openSidebar() {
+            fw.func("TOGGLESIDEBAR", false);
+            toggleFullScreen(window.top.document.body);
         }
 
         function ToggleFloorPlan(eventData) {
@@ -395,7 +452,7 @@
                 eventData.querySelector('[data-value="floorPlanCheckbox"]').checked = true;
                 toggle.innerHTML = "ON";
                 toggle.setAttribute("class", "activeToggle");
-                if(editMapValue === 1) {
+                if (editMapValue === 1) {
                     console.log("Map edit in the generic is on click " + editMapValue);
                     floorMapUploadBtn.style.visibility = 'visible';
                 }
@@ -444,25 +501,36 @@
             // eventData.getElementsByClassName("bi-funnel-fill")[0].style.setProperty("display","");
 
             let filledFunnel = eventData.getElementsByClassName("bi-funnel-fill")[0];
-            let funnel =  eventData.getElementsByClassName("bi-funnel")[0];
+            let funnel = eventData.getElementsByClassName("bi-funnel")[0];
             let searchBar = document.getElementById("filterSearchInputContainer");
             let filterContainer = document.getElementById("filterContainer");
             let pageName = document.getElementById('PageName');
+            let filterSaveCheckbox = document.getElementById('filterSaveCheckbox');
 
             filledFunnel.style.display = (window.getComputedStyle(filledFunnel).display === "none") ? "" : "none";
             funnel.style.display = (window.getComputedStyle(funnel).display === "none") ? "" : "none";
             searchBar.style.display = (window.getComputedStyle(searchBar).display === "none") ? "" : "none";
             filterContainer.style.display = (window.getComputedStyle(filterContainer).display === "none") ? "" : "none";
             pageName.style.display = (window.getComputedStyle(pageName).display === "none") ? "" : "none";
+            filterSaveCheckbox.style.display = (window.getComputedStyle(filterSaveCheckbox).display === "none") ? "" : "none";
 
-            fw.func("ADJUSTSIZE", "HEIGHT", (window.getComputedStyle(searchBar).display === "none") ? 75 : 145);
+            fw.func("ADJUSTSIZE", "HEIGHT", (window.getComputedStyle(searchBar).display === "none") ? 75 : 320);
             handleGeneric(`AdjustSize|${(window.getComputedStyle(searchBar).display === "none") ? '-45px' : '45px'}`)
-            document.getElementById("navContainer").style.setProperty("height", (window.getComputedStyle(searchBar).display === "none" ? "68%" : "30%"));
+            document.getElementById("navContainer").style.setProperty("height", (window.getComputedStyle(searchBar).display === "none" ? "68%" : "15%"));
+            fw.func("PUBLISHCLIENT", "loadDefaultFilter", true);
+        }
+
+        function handleSearchSelect(event) {
+            searchType = event.value;
         }
 
         function handleSearchInput() {
-            let searchData = document.getElementById("filterSearchInput").value;
-            handleGeneric(`SearchFor|${searchData}`);
+            searchQuery = document.getElementById("filterSearchInput").value;
+            if (searchQuery) {
+                document.getElementById('searchIcon').style.display = '';
+            } else {
+                document.getElementById('searchIcon').style.display = 'none';
+            }
         }
 
         function handleClearSearch() {
@@ -470,6 +538,65 @@
             handleGeneric(`SearchFor|`);
         }
 
+        function handleSearch() {
+            handleGeneric(`SearchFor|${searchQuery}|${searchType}`);
+        }
+
+        function loadSearchItems(eventData) {
+            const container = document.getElementById('filterResults');
+            container.innerHTML = '';
+            eventData.value.slice(0, 10).forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('filterResult');
+                itemDiv.classList.add('col-5');
+                itemDiv.innerHTML = item.name;
+                itemDiv.setAttribute('onclick', `loadSearchItem(event, ${item.id})`);
+                container.append(itemDiv);
+            });
+            container.style.display = '';
+        }
+
+        function loadSearchItem(event, id) {
+            event.stopPropagation();
+            fw.func("PUBLISHCLIENT", "GnericCardChildPressed", id + "|" + searchType);
+            document.querySelector('.bi.bi-funnel-fill').parentNode.onclick();
+        }
+
+        function filterSaveCheckboxChange(event) {
+            event.stopImmediatePropagation();
+            if (event.target.checked) {
+                document.getElementById('filterSaveButton').style.display = '';
+            } else {
+                document.getElementById('filterSaveButton').style.display = 'none';
+            }
+        }
+
+        function saveFilter() {
+            fw.func("PUBLISHCLIENT", "levelPersistenceFilterUpdate", {
+                searchType,
+                searchQuery,
+                activeMode: document.getElementById('filterSelect')?.value,
+            });
+            document.querySelector('.bi.bi-funnel-fill').parentNode.onclick();
+        }
+
+        function setFilters(eventData) {
+            const filterSelect = document.getElementById('filterSelect');
+            if (filterSelect) filterSelect.value = eventData.value.activeMode;
+            const searchSelect = document.getElementById('searchSelect');
+            if (searchSelect) {
+                searchSelect.value = eventData.value.searchType;
+                searchType = eventData.value.searchType;
+            }
+            const filterSearchInput = document.getElementById('filterSearchInput');
+            if (filterSearchInput) {
+                filterSearchInput.value = eventData.value.searchQuery;
+                searchQuery = eventData.value.searchQuery;
+            }
+            const filterSort = document.getElementById('filterSort');
+            if (filterSort) filterSort.value = eventData.value.sortType;
+            handleSearch();
+        }
 
         function SetToggleActive(element, value) {
 
@@ -491,7 +618,7 @@
 
         async function DeleteFloorPlan(element) {
             const res = await Client.confirm('Do you want to delete Floor Map.');
-            if(res)
+            if (res)
                 fw.func("PUBLISHCLIENT", "delete-floor-map", true);
         }
 
@@ -502,7 +629,7 @@
         */
         function addHtml(packet) {
             document.getElementById("widget").innerHTML = "";
-            
+
             document.getElementById("widget").append(packet.value);
         }
 
@@ -529,9 +656,9 @@
         */
         function toggleElementVisibility(packet) {
             let data = packet.value;
-            if(data.id){
+            if (data.id) {
                 const element = document.getElementById(data.id);
-                if(element)
+                if (element)
                     element.style.visibility = data.visibility;
             }
         }
@@ -545,11 +672,11 @@
 
         // API actions for dashboard mode
         function fw_dashStart(mode) {
-             
+
             if (mode !== "DASHBOARD") {
-                
+
                 if (typeof fw.attribs("background") !== "undefined") {
-                    document.getElementsByTagName("html")[0].style.setProperty("background-color",  fw.attribs("background"));
+                    document.getElementsByTagName("html")[0].style.setProperty("background-color", fw.attribs("background"));
                 } else {
                     document.getElementsByTagName("html")[0].style.setProperty("background-color", "grey");
                 }
@@ -592,7 +719,7 @@
             return true;
         }
 
-         
+
 
         // API called for incoming channel events
         function fw_feed(channel, scope, data) {
@@ -605,11 +732,12 @@
         var fw = new parent.widgetAPI(window.name);  // widget framework object
         fw.ready();
 
-                 
+
 
     </script>
 
 
 
 </body>
+
 </html>

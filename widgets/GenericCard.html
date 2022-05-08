@@ -662,9 +662,9 @@
             width: 99.5%;
         }
 
-        .iconWidth {
+        /* .iconWidth {
             width: 5%;
-        }
+        } */
 
         .setupContent {
             width: 45%;
@@ -985,6 +985,7 @@
         var IgnoreEnabled = true;
         var MaitnanceMode = false;
         var showActive = true;
+        var bypass = false;
 
         //#region --- Widget Dial specific functions ---
         function SetIgnoreEnabled(eventData) {
@@ -1398,6 +1399,12 @@
                 genericChildDoubleClicked(id);
             }
         }
+        function genericChildProfileClicked(event) {
+            event.stopPropagation();
+            bypass = true;
+            const id = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-id");
+            genericChildClicked(id);
+        }
         function genericChildClicked(id) {
                
             if (!MaitnanceMode) {
@@ -1607,9 +1614,7 @@
             var advSort;
             var collection = packet.value.value;
             var children = cardSelected.querySelector("[data-selector='Children']");
-            children.innerHTML = '';
-            debugger;
-            
+            children.innerHTML = '';            
             
             var existing = cardSelected.querySelector("[data-id='0']")
             if (existing === undefined || existing === null) {
@@ -1883,6 +1888,26 @@
                 }
             }
 
+            if(bypass) {
+                if(activeCards.filter(id => {
+                    if(rowElems[id] && rowElems[id].parentNode.getAttribute('data-status') === '1') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }).length === 1) {
+                    const locationIcon = rowElems[activeCards[1]].querySelector('img[alt="locationIcon"]');
+                    if(locationIcon) {
+                        rowElems[activeCards[1]].firstElementChild.onclick();
+                        rowElems[activeCards[1]].firstElementChild.onclick();  
+                        bypass = false;                      
+                    } else {
+                        rowElems[activeCards[1]].firstElementChild.onclick();
+                    }
+                } else {
+                    bypass = false;
+                }
+            }
         }
 
 
@@ -2195,6 +2220,7 @@
             if(showActive && status == '0'){
                 row.style.display = 'none';
             }
+            row.querySelector('[data-info="childIcon"]').setAttribute("onclick", "genericChildProfileClicked(event)");
             cardBody.appendChild(row);
             activeCards.push(id);
 

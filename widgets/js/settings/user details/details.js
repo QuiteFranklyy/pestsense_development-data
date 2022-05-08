@@ -10,7 +10,7 @@
  */
 
 
-const tzStrings = [
+ const tzStrings = [
     { label: "(GMT-12:00) International Date Line West", "value": "Etc/GMT+12" },
     { label: "(GMT-11:00) Midway Island, Samoa", "value": "Pacific/Midway" },
     { label: "(GMT-10:00) Hawaii", "value": "Pacific/Honolulu" },
@@ -349,20 +349,30 @@ var globalAmins;
 var globalAccessRoles;
 var companyAccessRolesId;
 var currentUserCompany = 0;
+var allUsers;
+var userAccessRoleControl;
 function load() {
+    console.log("Inside pestsense");
     accessData['no role'] = 0;
 
     Database.readRecords("Directory", "users", (data) => {
-        globalAmins = SensaCollection.load(data.value).getColumn("isglobaladmin");
-        // console.log("Users global from the database are: " + JSON.stringify(globalAmins, null, 4));
+        allUsers = SensaCollection.load(data.value);
+        globalAmins = allUsers.getColumn("isglobaladmin");
+        console.log("Users global from the database are: " + JSON.stringify(data.value, null, 4));
+    });
+
+    Database.readRecords("rodent", "UserRoles", (data) => {
+        accessUsers = SensaCollection.load(data.value);
+        //globalAmins = allUsers.getColumn("isglobaladmin");
+        //console.log("Users global from the database are: " + JSON.stringify(data.value, null, 4));
     });
 
     Database.readRecords("rodent", "UserAccessRole", function (eventData) {
-        var access = SensaCollection.load(eventData.value);
+        userAccessRoleControl = SensaCollection.load(eventData.value);
 
-        globalAccessRoles = access.getColumn("IsAdmin");
-        companyAccessRolesId = access.getColumn("CompanyId");
-        console.log("Admin daa is " + JSON.stringify(globalAccessRoles, null, 4));
+        globalAccessRoles = userAccessRoleControl.getColumn("IsAdmin");
+        companyAccessRolesId = userAccessRoleControl.getColumn("CompanyId");
+        //console.log("Admin daa is " + JSON.stringify(globalAccessRoles, null, 4));
     });
     compamyCollection = Script.getState("compamyCollection");
     var deleteAccountIcon = Script.getWidget("deleteAccountIcon");
@@ -505,6 +515,8 @@ async function save() {
     let res = await Client.confirm("Are you sure you would like to save these changes?", "Save User Information", { confirmText: "Save" })
     if (res) {
 
+
+
         var formData = Script.getFormByKey("details");
         if (formData === null) {
             alert("Please fill out all required fields");
@@ -515,7 +527,7 @@ async function save() {
         } 
         //console.log("Form not access " + JSON.stringify(accessData, null, 4));
 
-        console.log("Acces beore + " + formData.accessrole + " data " + JSON.stringify(accessData, null, 4));
+        //console.log("Acces beore + " + formData.accessrole + " data " + JSON.stringify(accessData, null, 4));
         var d = formData.accessrole;
         if (d in accessData) {
             console.log("Acces beore found " + accessData[d]);
@@ -533,7 +545,7 @@ async function save() {
             }
           
         }
-        console.log("Form data is " + JSON.stringify(formData, null, 4));
+        //console.log("Form data is " + JSON.stringify(formData, null, 4));
 
         
         
@@ -541,7 +553,7 @@ async function save() {
         formData.username = Script.getState("user");
         formData.isglobaladmin = formData.isglobaladmin === true ? 1 : 0;
 
-        console.log("Acces after + " + formData.accessrole);
+       // console.log("Acces after + " + formData.accessrole);
 
 
         var find = 0;
@@ -552,27 +564,60 @@ async function save() {
             }
         }
 
+        var filteredUserAccess = accessUsers.query((record, pk) =>{
+            if(record["CompanyId"] == currentUserCompany) {
+                return true;
+            }
+        });
+        
+        var accessUserColumn = filteredUserAccess.getColumn("User");
+        //console.log("Filgered data " + JSON.stringify(filteredUserAccess, null, 4));
+       // console.log("Filgered data columns " + JSON.stringify(accessUserColumn, null, 4));
+
+        var filterUsers = allUsers.query((record, pk) =>{
+            //console.log("Filgered data user "  + record["username"] + " and is " +  (record["username"].trim() in accessUserColumn));
+            if(accessUserColumn.indexOf(record["username"]) !== -1) {
+                return true;
+            }
+        });
+        //console.log("Filgered data directory " + JSON.stringify(filterUsers, null, 4));
+
+        var accessRoleUsers = filterUsers.getColumn("accessrole");
         if ((find == 0 && formData.isglobaladmin == 0) 
             || formData.isglobaladmin == undefined) {
             return;
         }
+
+        console.log("Filgered data accessRoleUsers " + JSON.stringify(accessRoleUsers, null, 4));
+
+        var filterUserAccessRole = userAccessRoleControl.query((record, pk) => {
+            if(record["CompanyId"] == currentUserCompany && record["IsAdmin"] == 1) {
+                return true;
+            }
+        });
+
+        console.log("Filgered data filterUserAccessRole " + JSON.stringify(filterUserAccessRole, null, 4));
+
         find = 0;
-        for (var i = 0; i <  companyAccessRolesId.length; i++) {
-            var compId = companyAccessRolesId[i];
-            if (parseInt(compId) == currentUserCompany) {
-                var index = companyAccessRolesId.indexOf(compId);
-                console.log("campany is index " + index);
-                if (globalAccessRoles[i] == 1) {
-                    
-                    find = 1;
-                    console.log("campany is find " + find);
-                    break;
-                }
-                
+        var keys = Object.keys(filterUserAccessRole.data);
+        //console.log("Filgered data keys " + JSON.stringify(keys, null, 4));
+        var occured = 0;
+        for (var i = 0; i <  accessRoleUsers.length; i++) {
+            var role = accessRoleUsers[i];
+            if (keys.indexOf(role) !== -1 || keys.indexOf(""+formData.accessrole) != -1) {
+                find = 1;
+            }
+
+            if (keys.indexOf(role) !== -1 ) {
+                occured += 1;
             }
         }
+        
 
-        if (find == 0) {
+        
+        
+        console.log("Filgered data occured " + occured);
+        if (occured == 1 && keys.indexOf(""+formData.accessrole) == -1) {
 
             await Client.alert("You must assign another user administrator role before change is allowed");
             //You must assign another user administrator role before change is allowed
