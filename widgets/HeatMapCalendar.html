@@ -479,8 +479,14 @@
         }
 
         function SetLegend(eventData) {
-            const settings = eventData.value.getFirst();
-            const heatMapSettings = JSON.parse(settings.Value);
+            var heatMapSettings;
+            for(var key in eventData.value.data){
+                if(eventData.value.data[key][2] == "HeatMapSettings"){
+                    heatMapSettings = JSON.parse(eventData.value.data[key][3]);
+                }
+            }
+            //const settings = eventData.value.getFirst();
+            //const heatMapSettings = JSON.parse(settings.Value);
             if (subDomain === "hour") {
                 legend = [heatMapSettings.CHMHourGreenThreshold,
                 heatMapSettings.CHMHourAmberThreshold];

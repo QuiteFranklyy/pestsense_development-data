@@ -5,1763 +5,7 @@
     <title>Trap Widget</title>
     <link rel="preload" href="../fonts/OpenSans400.woff2" as="font" crossorigin="anonymous">
     <link href="/widgets/js/line_chart/chartist.min.css" rel="stylesheet">
-
-    <style>
-        /* Customize the label (the container) */
-        .container {
-            display: block;
-            position: relative;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        /* Hide the browser's default checkbox */
-        .container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        /* Create a custom checkbox */
-        .checkmark {
-            position: absolute;
-            top: 3px;
-            left: 0;
-            height: 15px;
-            width: 15px;
-            background-color: #f2f2f2;
-            border-radius: 2px;
-            border: 2px solid #e57123;
-        }
-
-        /* On mouse-over, add a grey background color */
-        .container:hover input~.checkmark {
-            background-color: rgba(247, 152, 89, 0.7);
-        }
-
-        /* When the checkbox is checked, add a blue background */
-        .container input:checked~.checkmark {
-            background-color: rgba(245, 129, 51);
-        }
-
-        /* Create the checkmark/indicator (hidden when not checked) */
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        /* Show the checkmark when checked */
-        .container input:checked~.checkmark:after {
-            display: block;
-        }
-
-        /* Style the checkmark/indicator */
-        .container .checkmark:after {
-            left: 4px;
-            /* top: 1px; */
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 3px 3px 0;
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
-        }
-
-        body {
-            font-family: sans-serif !important;
-            font-size: 16px;
-            user-select: none;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-
-
-        .noSelect {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        #widget {
-            background-color: white;
-        }
-
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        #container::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Hide scrollbar for IE, Edge and Firefox */
-        #container {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-
-        #container {
-            position: fixed;
-            height: calc(100% - 2px);
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            overflow: auto;
-        }
-
-        thead th {
-            position: sticky;
-            position: -webkit-sticky;
-            top: 35px;
-            z-index: 999;
-            background-color: #f2f2f2;
-        }
-
-        .selectBtn:hover {
-            color: #000000;
-            text-decoration: none;
-            font-family: sans-serif;
-            background-color: #4d98c2ff;
-            padding: 10px 25px;
-            cursor: pointer;
-            margin: 2%;
-            height: 15px;
-        }
-
-        .btnSelected {
-            border-bottom: 2px solid #4c4c4c;
-            color: #000000;
-            text-decoration: none;
-            font-family: sans-serif;
-            background-color: #4d98c2ff;
-            padding: 10px 25px;
-            cursor: pointer;
-            margin: 2%;
-            height: 15px;
-        }
-
-        .selectBtn {
-            background-color: #6ec4f7ff;
-            /* Green */
-            font-family: sans-serif;
-            margin: 2%;
-            border: none;
-            color: white;
-            padding: 10px 25px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1rem;
-            height: 15px;
-            cursor: pointer;
-        }
-
-        table {
-            border-collapse: collapse;
-            table-layout: fixed;
-            border-spacing: 0;
-            width: 100%;
-            max-height: calc(100% - 30px);
-            border: none;
-            bottom: 38px;
-        }
-
-        th {
-            text-transform: capitalize;
-            text-align: left;
-            padding: 5px 0px 5px 0px;
-            margin: 0px 4px 0px 4px;
-            background-color: white;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .checkbox-row {
-            height: 1.5rem;
-        }
-
-        td {
-            position: sticky;
-            text-align: left;
-            word-break: break-word;
-            padding: 4px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .barLegend {
-            padding-left: 2%;
-            padding-right: 2%;
-            font-size: 12px;
-            color: white;
-            width: 100%;
-        }
-
-        tr:nth-child(even) {
-            background-color: rgba(0, 0, 0, .05);
-        }
-
-        tr.selected {
-            background-color: #dff0d8;
-            font-weight: bold
-                /* our pastel green*/
-        }
-
-        .rowHover:hover td {
-            background-color: #fffaf3;
-            /* our pastel yellow*/
-        }
-
-        #searchInp {
-            width: 100px;
-            float: right;
-            height: 25px;
-            text-indent: 4px;
-            font: 14px sans-serif;
-            display: none;
-            border-radius: 3px;
-            border-color: lightgray;
-            margin: 4px;
-            padding: .375rem .75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #495057;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-            border-radius: .25rem;
-            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-            -webkit-transition: width 0.4s ease-in-out;
-            transition: width 0.4s ease-in-out;
-        }
-
-        /* When the input field gets focus, change its width to 100% */
-        #searchInp:focus {
-            width: 300px;
-        }
-
-        /* Remove blue box around textbox. */
-        input:focus {
-            outline: none;
-        }
-
-        #headerBar {
-            top: 0;
-            z-index: 100;
-            position: sticky;
-            display: none;
-            background-color: #f2f2f2;
-            height: 34px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        #tableTitle {
-            float: left;
-            margin: 6px 0 6px 14px;
-        }
-
-        .headCol {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        /* Status border */
-        .newPhotoBorder {
-            border-right: 5px solid blue;
-        }
-
-        .openCardBorder {}
-
-        .normalCardBorder {
-            border-right: 5px solid #f2f2f2;
-        }
-
-        .alertCardBorder {
-            border-right: 5px solid red;
-        }
-
-
-        /* Triggered */
-        .redIcon {
-            background-image: url("/userfiles/Animal-Trap-Icon-Red.png");
-            background-size: contain;
-            background-color: white;
-            border-radius: 5px;
-        }
-
-        /* Inactive */
-        .greyIcon {
-            background-image: url("/userfiles/Animal-Trap-Icon-DkGrey.png");
-            background-size: contain;
-            background-color: white;
-            border-radius: 5px;
-        }
-
-        /* Set  */
-        .greenIcon {
-            background-image: url("/userfiles/Animal-Trap-Icon-Green.png");
-            background-size: contain;
-            background-color: white;
-            border-radius: 5px;
-        }
-
-
-
-        .capitalize {
-            text-transform: capitalize;
-            /* font-family:  //"Open Sans" !important; */
-            font-family: sans-serif;
-        }
-
-        .button {
-            background-color: #4CAF50;
-            /* Green */
-            font-family: sans-serif;
-            border: none;
-            color: white;
-            padding: 10px 25px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1rem;
-            border-radius: 6px;
-            height: 50px;
-            cursor: pointer;
-        }
-
-        .notes-css {
-            cursor: pointer;
-            display: block;
-            font-size: 16px;
-            font-family: sans-serif;
-            font-weight: 700;
-            color: #444;
-            line-height: 1.3;
-            padding: 0.6em 0.8em;
-            width: calc(100% - 16px);
-            max-width: 100%;
-            box-sizing: border-box;
-            margin: 8px;
-            border: 1px solid #aaa;
-            box-shadow: 0 1px 0 1px rgba(0, 0, 0, .04);
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            appearance: none;
-            background-color: #fff;
-            background-repeat: no-repeat, repeat;
-            background-position: right .7em top 50%, 0 0;
-            background-size: .65em auto, 100%;
-        }
-
-        .notes-css::-ms-expand {
-            display: none;
-        }
-
-        .notes-css:hover {
-            border-color: #888;
-        }
-
-        .notes-css:focus {
-            border-color: #aaa;
-            box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
-            box-shadow: 0 0 0 3px -moz-mac-focusring;
-            color: #222;
-            outline: none;
-        }
-
-        .notes-css option {
-            font-weight: normal;
-        }
-
-        .select-css {
-            cursor: pointer;
-            display: block;
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            line-height: 1.3;
-            padding: 0.6em 0.8em;
-            width: calc(100% - 16px);
-            max-width: 100%;
-            box-sizing: border-box;
-            margin: 8px;
-            border: 1px solid #aaa;
-            border-radius: 5px;
-            background: #646c83;
-            color: white;
-            box-shadow: 0 1px 0 1px rgba(0, 0, 0, .04);
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            appearance: none;
-            background-color: white;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAABWElEQVRoge3SoUvcYRzHcc9TcYjHYAgDYYJgESwLF5YWTCuWWUxrFuP+hUuzuWAzWbRYTAtLCxdWBhZhsMFAGIOxIRNl+lq5g8dxHPc7f797DN93+qXn+bx4fmNjURRFURRFURRFUbmh5f7XGhTzJvfSPu0UeZUadnMv7tEexov+YuPYzzw87RD1QogEU8dBZgAcYXIoRIKZwnFGxDtM3wmRYB7gfQbEB8yUgkgwDbRHiGhjtlREgnmIjyNAfMKjShAJZg4nFSJO8bhSRIKZx+cKEF+xMBJEgnmCLyUivmFxpIgEs4SzEhDfsZwFkWBW8OMOiJ94mhXRDU38HgLxC83c+2+FZzgvgPiD57l39wyruBgAcYkXuff2DWu46oP4i/XcOwcKLzuD/+8aG7n3FQqvOsO73WAz966hwlYCeV3lXRNVHl6r1d6i0fnervKuKIqiKIqie9g/aeemAbFqNx4AAAAASUVORK5CYII=') !important;
-            background-repeat: no-repeat, repeat !important;
-            background-position: right .7em top 50%, 0 0 !important;
-            background-size: 1em auto, 100% !important;
-        }
-
-        .select-css::-ms-expand {
-            display: none;
-        }
-
-        .select-css:hover {
-            background: #646c83;
-            color: white;
-        }
-
-        .select-css:focus {
-            border-color: #aaa;
-            box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
-            box-shadow: 0 0 0 3px -moz-mac-focusring;
-            border-color: #ffffff;
-            outline: none;
-        }
-
-        .select-css option {
-            font-weight: normal;
-        }
-
-        .container {
-            height: 60px;
-            position: relative;
-        }
-
-        .vertical-center {
-            margin: 0;
-            position: absolute;
-            top: 50%;
-            -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
-        }
-
-        ul {
-            margin: 4px 0 4px 0;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        li {
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .mapIcon {
-            float: right;
-            cursor: pointer;
-            font-size: 29px;
-            margin-right: 3%;
-        }
-
-        .mapIcon:hover {
-            float: right;
-            cursor: pointer;
-            font-size: 35px;
-            color: #f58133;
-        }
-
-        .dialText {
-            font-size: 12px;
-        }
-
-        .fullWidth {
-            width: 80%;
-        }
-
-        .container-fluid {
-            margin: 3%;
-        }
-
-        .displayContainer {
-            display: inline-block;
-            text-align: end;
-        }
-
-        .underlineIndicatorLeft {
-            border: 0.1px solid #ffffff;
-            border-radius: 52px;
-            background-color: #ffffff;
-            height: 3px;
-            display: flex;
-            width: 10px;
-            position: relative;
-            left: 0%;
-        }
-
-        .underlineIndicatorRight {
-            border: 0.1px solid #ffffff;
-            border-radius: 52px;
-            background-color: #ffffff;
-            height: 3px;
-            display: flex;
-            width: 10px;
-            position: relative;
-            left: 94%;
-        }
-
-
-
-        .underlineIndicatorCenter {
-            border: 0.1px solid #ffffff;
-            border-radius: 52px;
-            background-color: #ffffff;
-            height: 3px;
-            display: flex;
-            width: 10px;
-            position: relative;
-            left: 46%;
-        }
-
-        @media screen and (max-width: 1440px) {
-            .underlineIndicatorLeft {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 0%;
-            }
-
-            .underlineIndicatorRight {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 89%;
-            }
-
-
-
-            .underlineIndicatorCenter {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 44%;
-            }
-        }
-
-        @media screen and (max-width: 1024px) {
-            .underlineIndicatorLeft {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 0%;
-            }
-
-            .underlineIndicatorRight {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 84%;
-            }
-
-
-
-            .underlineIndicatorCenter {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 43%;
-            }
-        }
-
-
-        @media screen and (max-width: 768px) {
-            .underlineIndicatorLeft {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 0%;
-            }
-
-            .underlineIndicatorRight {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 78%;
-            }
-
-
-
-            .underlineIndicatorCenter {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 10px;
-                position: relative;
-                left: 40%;
-            }
-        }
-
-        @media screen and (max-width: 425px) {
-            .underlineIndicatorLeft {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 0%;
-            }
-
-            .underlineIndicatorRight {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 78%;
-            }
-
-
-
-            .underlineIndicatorCenter {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 40%;
-            }
-        }
-
-        @media screen and (max-width: 375px) {
-            .underlineIndicatorLeft {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 0%;
-            }
-
-            .underlineIndicatorRight {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 74%;
-            }
-
-
-
-            .underlineIndicatorCenter {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 38%;
-            }
-        }
-
-
-
-        @media screen and (max-width: 320px) {
-            .underlineIndicatorLeft {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 0%;
-            }
-
-            .underlineIndicatorRight {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 70%;
-            }
-
-
-
-            .underlineIndicatorCenter {
-                border: 0.1px solid #ffffff;
-                border-radius: 52px;
-                background-color: #ffffff;
-                height: 3px;
-                display: flex;
-                width: 9px;
-                position: relative;
-                left: 35%;
-            }
-        }
-
-        .UnderlineGreen {
-            width: 100%;
-            border: 1px solid #388b3d;
-            border-radius: 52px;
-            margin-top: 3.7px;
-            margin-bottom: 3.7px;
-            background-color: #388b3d;
-        }
-
-
-
-
-        .UnderlineOrange {
-            width: 100%;
-            border: 1px solid #f88924ff;
-            border-radius: 52px;
-            margin-top: 3.7px;
-            margin-bottom: 3.7px;
-            background-color: #f88924ff;
-        }
-
-        .UnderlineRed {
-            border: 1px solid #d74423ff;
-            border-radius: 52px;
-            margin-top: 3.7px;
-            margin-bottom: 3.7px;
-            background-color: #d74423ff;
-        }
-
-        .UnderlineGray {
-            width: 100%;
-            border: 1px solid gray;
-            border-radius: 52px;
-            margin-top: 3.7px;
-            margin-bottom: 3.7px;
-            background-color: gray;
-        }
-
-        .LabelStyle {
-            font-size: 8.5px;
-            justify-content: center;
-            display: inline-flex;
-        }
-
-        .SideBarGray {
-            border-left: 8px solid gray;
-        }
-
-        .SideBarGreen {
-            border-left: 8px solid green;
-        }
-
-        .SideBarYellow {
-            border-left: 8px solid orange;
-        }
-
-        .SideBarBrown {
-            border-left: 8px solid #784421;
-        }
-
-        .SideBarRed {
-            border-left: 8px solid red;
-        }
-
-        .StatusIndicator {
-            float: right;
-            font-size: 10px;
-        }
-
-        .ValueStyle {
-            font-size: 15.5px;
-            font-weight: bold;
-            color: #41505aff;
-            /* font-family: "Open Sans" !important; */
-            font-family: sans-serif;
-        }
-
-        .tabBtn {
-            text-align: center;
-            width: 50%;
-            padding-left: 10%;
-            padding-right: 10%;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            font-family: sans-serif;
-            background-color: rgb(230 230 230);
-            border: none;
-            color: #41505a;
-            padding: 10px 25px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 2px;
-        }
-
-        .tabBtn:hover {
-            text-align: center;
-            width: 50%;
-            padding-left: 10%;
-            padding-right: 10%;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            font-family: sans-serif;
-            background-color: #4d98c2;
-            border: none;
-            color: white;
-            padding: 10px 25px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 2px;
-        }
-
-        .tabBtnSelected {
-            text-align: center;
-            width: 50%;
-            padding-left: 10%;
-            padding-right: 10%;
-            padding-top: 15px;
-            padding-bottom: 15px;
-            font-family: sans-serif;
-            background-color: #4d98c2;
-            border: none;
-            color: white;
-            padding: 10px 25px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 2px;
-        }
-
-        .normalCardBorder {
-            background-color: #e6e6e6ff;
-        }
-
-        .normalCardBorder {
-            background-color: #e6e6e6ff;
-        }
-
-        .whiteBackgroundCard {
-            background-color: #f2f2f2 !important
-        }
-
-        .normalCardBorder:not(.disableHover):hover {
-            background-color: #f2f2f2
-        }
-
-        .normalCardBorder.disableHover {
-            background-color: #a8a8a8
-        }
-
-        [data-info="chart"] {
-            padding: 20px;
-        }
-
-        [data-info="chart"] table {
-            width: 100%;
-            height: 400px;
-        }
-
-        .charttitle {
-            text-align: center;
-        }
-
-        .bars {
-            color: white;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        .bars td {
-            text-align: center;
-            vertical-align: bottom;
-        }
-
-        .bars div:hover {
-            opacity: 0.6;
-        }
-
-        .legend {
-            vertical-align: bottom;
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .legbox {
-            display: block;
-            clear: both;
-        }
-
-        .xaxisname {
-            margin: 5px;
-            color: #fff;
-            font-size: 77%;
-            padding: 5px;
-            float: left;
-        }
-
-
-        /*Flat UI colors*/
-
-        .one {
-            background: #16A085;
-        }
-
-        .two {
-            background: #2ECC71;
-        }
-
-        .three {
-            background: #27AE60;
-        }
-
-        .four {
-            background: #3498DB;
-        }
-
-        .five {
-            background: #2980B9;
-        }
-
-        .six {
-            background: #9B59B6;
-        }
-
-        .seven {
-            background: #8E44AD;
-        }
-
-        .eight {
-            background: #34495E;
-        }
-
-        .nine {
-            background: #2C3E50;
-        }
-
-        .ten {
-            background: #22313f;
-        }
-
-        .eleven {
-            background: #F1C40F;
-        }
-
-        .twelve {
-            background: #F39C12;
-        }
-
-        .thirteen {
-            background: #E67E22;
-        }
-
-        .fourteen {
-            background: #D35400;
-        }
-
-        .fifteen {
-            background: #E74C3C;
-        }
-
-        .sixteen {
-            background: #C0392B;
-        }
-
-        .seventeen {
-            background: #ECF0F1;
-        }
-
-        .seventeen.clouds {
-            color: #BDC3C7;
-        }
-
-        .eighteen {
-            background: #BDC3C7;
-        }
-
-        .nineteen {
-            background: #95A5A6;
-        }
-
-        .twenty {
-            background: #7F8C8D;
-        }
-
-        .barColor {
-            background-color: #6ec4f7ff;
-        }
-
-        .barColor:hover {
-            background-color: #4d98c2;
-            cursor: pointer;
-        }
-
-
-        .barColorMotion {
-            background-color: #dbdbdb;
-        }
-
-        .barColorMotion:hover {
-            background-color: #faf8f8;
-            cursor: pointer;
-        }
-
-        .flex {
-            display: -webkit-box;
-            /* OLD - iOS 6-, Safari 3.1-6, BB7 */
-            display: -ms-flexbox;
-            /* TWEENER - IE 10 */
-            display: -webkit-flex;
-            /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
-            display: flex;
-            /* NEW, Spec - Firefox, Chrome, Opera */
-            flex: 1;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            -webkit-display: flex;
-            -webkit-flex-direction: row;
-            -webkit-align-items: flex-start;
-        }
-
-        .labelChild {
-            width: 100%;
-        }
-
-        @supports (overflow:-webkit-marquee) and (justify-content:inherit) {
-            .flex {
-                display: -webkit-flex;
-                /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
-                flex: 1;
-                flex-direction: row;
-                align-items: flex-start;
-            }
-        }
-
-        .iconWidth {
-            width: 5%;
-        }
-
-        @media screen and (max-width: 2560px) {
-            .CardWidth {
-                width: 99.5%;
-            }
-
-            .setupContent {
-                width: 45%;
-                display: grid;
-                margin-left: 3%;
-            }
-        }
-
-        @media screen and (max-width: 1504px) {
-            .CardWidth {
-                width: 99%;
-            }
-
-            .setupContent {
-                width: 45%;
-                display: grid;
-                margin-left: 3.5%;
-            }
-        }
-
-        @media screen and (max-width: 1404px) {
-            .CardWidth {
-                width: 99%;
-            }
-
-            .setupContent {
-                width: 45%;
-                display: grid;
-                margin-left: 5.5%;
-            }
-        }
-
-
-        @media screen and (max-width: 868px) {
-            .CardWidth {
-                width: 99%;
-            }
-
-            .setupContent {
-                width: 38%;
-                display: grid;
-                margin-left: 7%;
-            }
-
-            .labelChild {
-                width: 100%;
-                font-size: 7px;
-            }
-        }
-
-
-        @media screen and (max-width: 722px) {
-            .CardWidth {
-                width: 99%;
-            }
-
-            .setupContent {
-                width: 38%;
-                display: grid;
-                margin-left: 11%;
-            }
-
-            .labelChild {
-                width: 100%;
-                font-size: 7px;
-            }
-        }
-
-
-        @media screen and (max-width: 427px) {
-            .labelChild {
-                width: 100%;
-                font-size: 4px;
-            }
-
-            .CardWidth {
-                width: 97%;
-            }
-
-            .setupContent {
-                width: 38%;
-                display: grid;
-                margin-left: 14%;
-            }
-        }
-
-        @media screen and (max-width: 320px) {
-            .labelChild {
-                width: 100%;
-                font-size: 4px;
-            }
-
-            .CardWidth {
-                width: 97%;
-            }
-
-            .setupContent {
-                width: 33%;
-                display: grid;
-                margin-left: 15%;
-            }
-        }
-
-        .ct-golden-section {
-            display: block;
-            position: relative;
-            width: 100%;
-            height: 218px;
-        }
-
-        .alignCenter {
-            width: 100%;
-            text-align: center;
-            font-size: 10px;
-        }
-
-        .ct-label.ct-horizontal.ct-end {
-            -webkit-box-align: flex-start;
-            -webkit-align-items: flex-start;
-            -ms-flex-align: flex-start;
-            align-items: flex-start;
-            -webkit-box-pack: flex-start;
-            -webkit-justify-content: flex-start;
-            -ms-flex-pack: flex-start;
-            justify-content: flex-start;
-            text-align: left;
-            text-anchor: start;
-            color: white;
-            font-size: 6px;
-            padding-top: 16px;
-        }
-
-        .ct-grid {
-            stroke: rgb(255 255 255 / 20%);
-            stroke-width: 0.9px;
-            stroke-dasharray: 0px;
-        }
-
-        .ct-label.ct-vertical.ct-start {
-            -webkit-box-align: flex-end;
-            -webkit-align-items: flex-end;
-            -ms-flex-align: flex-end;
-            align-items: flex-end;
-            -webkit-box-pack: flex-end;
-            -webkit-justify-content: flex-end;
-            -ms-flex-pack: flex-end;
-            justify-content: flex-end;
-            text-align: right;
-            text-anchor: end;
-            color: white;
-            font-size: 10px;
-        }
-
-        .labelsParent {
-            position: relative;
-            top: 84%;
-            color: white;
-            display: flex;
-            padding-left: 0%;
-            padding-right: 2%;
-        }
-
-
-        .postionChartButton {
-            position: absolute;
-            bottom: 50%;
-            border-radius: 2px;
-            right: 50%;
-            padding: 8px;
-            background-color: #4d98c25c;
-            color: white;
-            z-index: 55;
-        }
-
-        @media screen and (max-width: 600px) {
-
-            .labelsParent {
-                position: relative;
-                top: 84%;
-                color: white;
-                display: flex;
-                padding-left: 9%;
-                padding-right: 0%;
-            }
-
-            .postionChartButton {
-                position: absolute;
-                bottom: 50%;
-                border-radius: 2px;
-                right: 40%;
-                padding: 8px;
-                background-color: #4d98c25c;
-                color: white;
-                z-index: 55;
-            }
-        }
-
-
-
-        .iconDeviceError {
-            position: absolute;
-            left: 3px;
-            top: -10px;
-        }
-
-        .iconCommunicationError {
-            position: absolute;
-            left: 19px;
-            top: -10px;
-        }
-
-        .PositionToggle {
-            /* text-align: center; */
-            width: 100%;
-            text-align: right;
-            /* margin-right: 19px; */
-            position: relative;
-            right: 22px;
-            margin-top: 10px;
-        }
-
-        /* The switch - the box around the slider */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 73px;
-            height: 23px;
-        }
-
-        /* Hide default HTML checkbox */
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 20px;
-            right: 0;
-            bottom: 0;
-            background-color: #6ac0f3;
-            -webkit-transition: .4s;
-            transition: .4s;
-            font-size: 9px;
-            padding-top: 10px;
-            padding-left: 24px;
-            color: white;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 15px;
-            width: 15px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-        }
-
-        span {
-            /* font-family: "Open Sans"!important; */
-            font-family: sans-serif;
-        }
-
-        .inactiveToggle {
-            /* font-family: "Open Sans"!important; */
-            font-family: sans-serif;
-            position: absolute;
-            top: 6px;
-            left: 21px;
-        }
-
-        .activeToggle {
-            /* font-family: "Open Sans"!important; */
-            font-family: sans-serif;
-            position: absolute;
-            left: 5px;
-            top: 6px;
-        }
-
-        .Selected {
-            position: absolute;
-            left: 10px;
-        }
-
-        input:checked+.slider {
-            background-color: #6ac0f3ff;
-            font-size: 9px;
-            padding-top: 10px;
-            padding-right: 45px;
-            color: white;
-        }
-
-        input:focus+.slider {
-            box-shadow: 0 0 1px #6ac0f3ff;
-        }
-
-        input:checked+.slider:before {
-            -webkit-transform: translateX(46px);
-            -ms-transform: translateX(46px);
-            transform: translateX(46px);
-        }
-
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-
-        /* Use this selector to override the line style on a given series */
-        .ct-series-a .ct-line {
-            /* Set the colour of this series line */
-            stroke: #4d98c2;
-            /* Control the thikness of your lines */
-            stroke-width: 5px;
-            /* Create a dashed line with a pattern */
-        }
-
-        /* Use this selector to override the line style on a given series */
-        .ct-series-b .ct-line {
-            /* Set the colour of this series line */
-            stroke: #dbdbdb;
-            /* Control the thikness of your lines */
-            stroke-width: 5px;
-            /* Create a dashed line with a pattern */
-        }
-
-        .ct-series-a .ct-point {
-            stroke: #4d98c2;
-        }
-
-        .ct-series-b .ct-point {
-            stroke: #dbdbdb;
-        }
-
-        .flexItem {
-            width: 50%;
-        }
-
-        .iconGrid {
-            width: 40px;
-            height: 60px;
-            cursor: pointer;
-        }
-
-        .flexItemHolder {
-            text-align: center;
-        }
-
-        .PositionCheckbox {
-            display: inline;
-            position: relative;
-            margin-bottom: 20px;
-            margin-right: 8px;
-            left: 0;
-            right: -2px;
-            float: right;
-        }
-
-        .CheckboxLabel {
-            display: table-caption;
-            color: white;
-            float: left;
-            margin-right: 10px;
-        }
-
-        .CustomCheckbox {
-            width: 35px;
-            height: 50px;
-        }
-
-
-        input[type='checkbox'] {
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeSpeed;
-            width: 35px;
-            height: 35px;
-            margin: 0;
-            margin-right: 1px;
-            display: block;
-            float: left;
-            position: relative;
-            cursor: pointer;
-        }
-
-        input[type='checkbox'].small-checkbox {
-            width: 28px;
-            height: 28px;
-        }
-
-        input[type='checkbox']:after {
-            content: "";
-            vertical-align: middle;
-            text-align: center;
-            line-height: 41px;
-            position: absolute;
-            cursor: pointer;
-            height: 35px;
-            width: 35px;
-            left: 0;
-            top: 0;
-            font-size: 35px;
-            -webkit-box-shadow: inset 0 1px 1px #646c83, 0 1px 0 #646c83;
-            -moz-box-shadow: inset 0 1px 1px #41505a, 0 1px 0 #41505a;
-            box-shadow: inset 0 1px 1px #646c83, 0 1px 0 #646c83;
-            background: #646c83;
-        }
-
-        input[type='checkbox'].YesCheckbox::after {
-            -webkit-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
-            -moz-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
-            box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
-            background: #388b3d;
-        }
-
-        input[type='checkbox'].YesCheckbox:checked::after {
-            -webkit-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
-            -moz-box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
-            box-shadow: inset 0 1px 1px #388b3d, 0 1px 0 #388b3d;
-            background: #388b3d;
-        }
-
-        input[type='checkbox'].NoCheckbox::after {
-            -webkit-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
-            -moz-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
-            box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
-            background: #d74423;
-        }
-
-        input[type='checkbox'].NoCheckbox:checked::after {
-            -webkit-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
-            -moz-box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
-            box-shadow: inset 0 1px 1px #d74423, 0 1px 0 #d74423;
-            background: #d74423;
-        }
-
-        input[type='checkbox'].small-checkbox:after {
-            width: 28px;
-            height: 28px;
-            font-size: 28px;
-            line-height: 30px;
-        }
-
-        /* input[type='checkbox']:hover:after, input[type='checkbox']:checked:hover:after {
-            background: #646c83;
-            height: 35px;
-            width: 35px;
-            content: '\2714';
-            color: #fff;
-            font-size: 35px;
-        } */
-
-        input[type='checkbox']:checked:after {
-            background: #646c83;
-            content: '\2714';
-            height: 35px;
-            width: 35px;
-            color: #fff;
-            font-size: 35px;
-        }
-
-        input[type='checkbox'].small-checkbox:checked:after {
-            width: 28px;
-            height: 28px;
-            font-size: 28px;
-        }
-
-        /* input[type="number"] {
-            -webkit-appearance: textfield;
-            -moz-appearance: textfield;
-            appearance: textfield;
-        } */
-
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-        }
-
-        input[type=number].number-input::-webkit-inner-spin-button,
-        input[type=number].number-input::-webkit-outer-spin-button {
-            -webkit-appearance: auto;
-        }
-
-        .number-input {
-            margin: 8px;
-            border: 1px solid #aaa;
-            /*            padding: 0.6em 0.8em;
-    */
-            background-color: #646c83;
-            display: inline-flex;
-        }
-
-        .number-input,
-        .number-input * {
-            box-sizing: border-box;
-        }
-
-        .number-input button {
-            outline: none;
-            -webkit-appearance: none;
-            background-color: transparent;
-            border: none;
-            align-items: center;
-            justify-content: center;
-            width: 3rem;
-            height: 41px;
-            cursor: pointer;
-            margin: 0;
-            position: relative;
-        }
-
-        .number-input button:before,
-        .number-input button:after {
-            display: inline-block;
-            position: absolute;
-            content: '';
-            width: 1rem;
-            height: 2px;
-            background-color: white;
-            color: white;
-            transform: translate(-50%, -50%);
-        }
-
-        .number-input button.plus:after {
-            transform: translate(-50%, -50%) rotate(90deg);
-        }
-
-        input[type=number].number-input {
-            font-family: sans-serif;
-            max-width: 5rem;
-            border: none;
-            color: white;
-            background-color: #646c83;
-            border-width: 0 2px;
-            font-size: 22px;
-            height: 42px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .number-input input[type=number] {
-            font-family: sans-serif;
-            max-width: 5rem;
-            border: none;
-            color: white;
-            background-color: #646c83;
-            border-width: 0 2px;
-            font-size: 22px;
-            height: 42px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .alignLabelCenter {
-            width: 100%;
-            text-align: center;
-            color: white;
-        }
-
-        .inputDate {
-            background: #646c83;
-            border: none;
-            color: white;
-            height: 40px;
-            font-size: 16px;
-            width: 100%;
-            text-align: center;
-        }
-
-        ::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-
-        .inputText {
-            position: relative;
-            text-align: left;
-            width: 100%;
-            font-size: 16px;
-        }
-
-
-
-        .StationId {
-            position: absolute;
-            left: 1px;
-            top: 0px;
-            font-size: 14px;
-            display: block;
-            text-align: center;
-            min-width: 10px;
-        }
-
-        .StationLabel {
-            color: #41505a;
-            top: 44px;
-            /* left: 4px; */
-            text-align: center;
-            font-weight: 800;
-        }
-
-        .PositionNumber {
-            float: right;
-            font-size: 10px;
-            margin-right: 6px;
-            /* font-family: "Open Sans" !important; */
-            font-family: sans-serif;
-        }
-
-        input,
-        label {
-            display: block;
-        }
-
-        .BoxLabel {
-            margin-right: 4%;
-            margin-left: 1%;
-            display: block;
-            width: 100%;
-        }
-
-        label {
-            color: white;
-            padding-left: 9px;
-        }
-
-        .CardLabels {
-            width: 100%;
-            position: relative;
-            left: -18px;
-        }
-
-        .PositionIcon {
-            position: relative;
-            top: 10px;
-            right: -5px;
-        }
-
-        .ErrorLabelHolder {
-            flex-direction: row;
-            width: 100%;
-            text-align: left;
-            padding-left: 10px;
-            display: block;
-        }
-
-        .iconHover:hover {
-            cursor: pointer;
-        }
-
-        .fixMargin {
-            margin-top: 2px;
-            font-size: 14px;
-        }
-
-        .rotate {
-            transform: rotate(180deg);
-        }
-
-        .hoursLabel {
-            text-align: center;
-            color: white;
-            margin-top: 4px;
-        }
-    </style>
+    <link href="/widgets/Rodent.css" rel="stylesheet">
 </head>
 
 <body id="body">
@@ -2645,34 +889,42 @@
                                 <div class="flex" style="justify-content: space-between; align-items: center;">
                                     <label data-info="observationQ1">Bait Taken?</label>
                                     <div style="display: flex;">
-                                        <span style="margin-right: 1rem; display: flex; flex-direction: column; align-items: center;">
-                                            <input type="checkbox" class="CustomCheckbox YesCheckbox" data-info="RepeatCheckbox"
-                                                name="baitTakenYes" style="border-radius:5px;" onchange="YesClicked(event)" />
+                                        <span
+                                            style="margin-right: 1rem; display: flex; flex-direction: column; align-items: center;">
+                                            <input type="checkbox" class="CustomCheckbox YesCheckbox"
+                                                data-info="RepeatCheckbox" name="baitTakenYes"
+                                                style="border-radius:5px;" onchange="YesClicked(event)" />
                                             <label style="padding: 0px; margin-top: 2px;">Yes</label>
                                         </span>
                                         <span style="display: flex; flex-direction: column; align-items: center;">
-                                            <input type="checkbox" class="CustomCheckbox NoCheckbox" data-info="RepeatCheckbox"
-                                                name="baitTakenNo" style="border-radius:5px;" onchange="NoClicked(event)" />
+                                            <input type="checkbox" class="CustomCheckbox NoCheckbox"
+                                                data-info="RepeatCheckbox" name="baitTakenNo" style="border-radius:5px;"
+                                                onchange="NoClicked(event)" />
                                             <label style="padding: 0px; margin-top: 2px;">No</label>
                                         </span>
                                     </div>
                                 </div>
-                                <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 12px; display: none;">
+                                <div class="flex"
+                                    style="justify-content: space-between; align-items: center; margin-top: 12px; display: none;">
                                     <label data-info="observationQ2">How Much %?</label>
                                     <input class="quantity number-input" min="0" data-info="qtyInput" value="10"
                                         type="number" onchange="BaitPerChange(event)">
                                 </div>
-                                <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 12px; display: none;">
+                                <div class="flex"
+                                    style="justify-content: space-between; align-items: center; margin-top: 12px; display: none;">
                                     <label data-info="observationQ3">Added / Replaced Bait</label>
                                     <div style="display: flex;">
-                                        <span style="margin-right: 1rem; display: flex; flex-direction: column; align-items: center;">
-                                            <input type="checkbox" class="CustomCheckbox YesCheckbox" data-info="RepeatCheckbox"
-                                               name="openAddBait" style="border-radius:5px;" onchange="YesClicked(event)" />
+                                        <span
+                                            style="margin-right: 1rem; display: flex; flex-direction: column; align-items: center;">
+                                            <input type="checkbox" class="CustomCheckbox YesCheckbox"
+                                                data-info="RepeatCheckbox" name="openAddBait" style="border-radius:5px;"
+                                                onchange="YesClicked(event)" />
                                             <label style="padding: 0px; margin-top: 2px;">Yes</label>
                                         </span>
                                         <span style="display: flex; flex-direction: column; align-items: center;">
-                                            <input type="checkbox" class="CustomCheckbox NoCheckbox" data-info="RepeatCheckbox"
-                                                style="border-radius:5px;" onchange="NoClicked(event)" />
+                                            <input type="checkbox" class="CustomCheckbox NoCheckbox"
+                                                data-info="RepeatCheckbox" style="border-radius:5px;"
+                                                onchange="NoClicked(event)" />
                                             <label style="padding: 0px; margin-top: 2px;">No</label>
                                         </span>
                                     </div>
@@ -2704,11 +956,8 @@
                         <div class="container flex" style="margin: 8px 8px 4px 0; ">
                             <div class="col-left" style="width:52%;">
                                 <div class="iconWidth PositionIcon">
-                                    <img
-                                        src="data:image/png;base64,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"
-                                        width="36"
-                                        height="36"
-                                    />
+                                    <img src="data:image/png;base64,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"
+                                        width="36" height="36" />
                                 </div>
                                 <!--<div data-info="icon" class="redIcon vertical-center" style="display: inline-block; width: 25px; height: 25px;"></div>-->
                                 <div class="vertical-center setupContent">
@@ -2744,7 +993,7 @@
                                     <div class="UnderlineOrange" style="width:100%">
                                         <span data-value="status2Pos" class="underlineIndicatorCenter"></span>
                                     </div>
-                                    <span class="LabelStyle" data-info="lbl2">IMPORTANT</span>
+                                    <span class="LabelStyle" data-info="lbl2">IMPORT ANT</span>
                                 </div>
 
                                 <div class="displayContainer"
@@ -3198,10 +1447,13 @@
                     "SetCurrentStationId": SetCurrentStationId,
                     "SetAdjacentStationIds": SetAdjacentStationIds,
                     "SetModelTypes": setModelTypes,
+                    "SetModelConfigurations": setModelConfigurations,
                     "SetModels": setModels,
                     "SetApplicationSettings": setApplicationSettings,
                     "set timewindow dates": setTimeWindowDates,
-                    "toggle time window filter": toggleTimeWindowFilter
+                    "toggle time window filter": toggleTimeWindowFilter,
+                    "set lookups": setLookups,
+                    "set animal categories": setAnimalCategories,
                 },
                 outputEvents:
                     [
@@ -3342,16 +1594,20 @@
         var siteRemoveEnabled = false;
         var siteSelectedDevices = [];
         var modelTypes = [];
+        var modelConfigurations = [];
         var models = [];
         var filteredModels = [];
         var applicationSettings = {};
         var timeWindowEnabled = false;
         var timeWindowStartDate;
-        var timeWindowEndDate;        
+        var timeWindowEndDate;
         var siteQtySet = null;
         var siteWeightPerBlock = null;
         var siteBaitExpiry = null;
         var siteBaitId = null;
+        var configChangedDeviced = null;
+        var lookups = [];
+        var animalCategories= [];
 
         Date.prototype.addDays = function (days) {
             var date = new Date(this.valueOf());
@@ -3657,6 +1913,14 @@
             SetSelectValues(bindingData, "Quantity");
         }
 
+        function setLookups(eventData) {
+            lookups = eventData.value;
+        }
+
+        function setAnimalCategories(eventData) {
+            animalCategories = eventData.value;
+        }
+
         // client input event function
         // function that recieves the available quantities that can be used for each bait type. This information is set in the App Settings,
         // and the data is retrieved from a database from the BaitBox controller.
@@ -3667,20 +1931,20 @@
                 values = packet.value;
             }
 
-            activeDropdowndataSources.push({
-                Name: "DeviceTypes",
-                value:
-                    [
-                        {
-                            Id: 1,
-                            Name: "Bait Weight (Default)"
-                        },
-                        {
-                            Id: 1,
-                            Name: "Snap Trap"
-                        }
-                    ]
-            });
+            // activeDropdowndataSources.push({
+            //     Name: "DeviceTypes",
+            //     value:
+            //         [
+            //             {
+            //                 Id: 1,
+            //                 Name: "Bait Weight (Default)"
+            //             },
+            //             // {
+            //             //     Id: 1,
+            //             //     Name: "Snap Trap"
+            //             // }
+            //         ]
+            // });
 
             var vals = PackageData(values);
 
@@ -3773,6 +2037,8 @@
             for (var i = 0; i < rowKeys.length; i++) {
                 var row = rowElems[rowKeys[i]];
                 var selectNode = row.querySelector("[data-select='" + elementName + "']");
+                if(!selectNode)
+                    continue;
                 selectNode.innerHTML = "";
                 // If no trap types have been added we need to add them all.
                 if (selectNode.children.length === 1) {
@@ -3937,6 +2203,10 @@
             const baitDropdown = siteClearScreen.querySelector("[data-form='formBait']").querySelector("[data-select='BaitType']");
             baitDropdown.innerHTML = "";
             baitDropdown.innerHTML = elements;
+            var expiryDate = new Date();
+            expiryDate = expiryDate.addDays(parseInt(ActiveCardProduct.Expiry));
+            var expiryDate = formatDate(expiryDate, "yyyy-MM-dd");
+            siteClearScreen.querySelector("[data-info='expiryDate']").value = expiryDate;
 
             // var container = document.getElementById("container");
             // // Offset is the amount of the card that is hidden.
@@ -4432,7 +2702,8 @@
 
 
             var user = fw.func("GETUSER");
-            if (user !== "admin" && user !== "devadmin@pestsense.com") {
+            const isUserGlobalAdmin = Script.getState('isUserGlobalAdmin')
+            if (isUserGlobalAdmin == 0 || isUserGlobalAdmin == undefined) {
                 row.Card.querySelector("[data-info='r1']").style.setProperty("display", "none");
                 row.Card.querySelector("[data-info='r2']").style.setProperty("display", "none");
                 row.Card.querySelector("[data-info='r3']").style.setProperty("display", "none");
@@ -4570,15 +2841,15 @@
 
             var rebaitRangeDelimiter = rowState[id].RebaitRange * rebaitRangePercent;
             var ghostWeight = (rowState[id].DeviceRange) / (enteredWeight1 + BarCompensation);
-            
-            if(rowState[id].State == 0) {
+
+            if (rowState[id].State == 0) {
                 dbVal[val] = {
                     "Id": val,
                     "CompanyProductId": siteBaitId ? siteBaitId : baitName,
                     "EmptyBy": new Date(),
                     "FoodDate": expiryDate,
                     "SetTime": new Date().getTime(),
-                    "Expiry": siteBaitExpiry ? siteBaitExpiry: bait.Expiry,
+                    "Expiry": siteBaitExpiry ? siteBaitExpiry : bait.Expiry,
                     "EnteredWeight": enteredWeight1 + BarCompensation,
                 };
             } else {
@@ -4616,7 +2887,7 @@
                 rowElems[id].querySelector("[data-value='Dial']").innerHTML = "100%";
             }
             else {
-                if(rowState[id].State != 0)
+                if (rowState[id].State != 0)
                     rowElems[id].querySelector("[data-value='Dial']").innerHTML = "100%";
 
             }
@@ -4646,7 +2917,7 @@
                 value: enteredWeight1.toString()
             });
 
-            if(rowState[id].State == 0) {
+            if (rowState[id].State == 0) {
                 ActiveCardProduct = DefaultActiveCardProduct;
                 CancelSiteBait();
                 CancelBait(event);
@@ -4939,7 +3210,7 @@
         */
         function DecrementCounterSet(eventData) {
             var val = parseInt(eventData.parentNode.parentNode.querySelector("[data-info='stationInput']").value);
-            if (val > minDown) {
+            if (val > 1) {
                 eventData.parentNode.parentNode.querySelector("[data-info='stationInput']").value = val - 1;
                 //    CalculateQtyLabel(eventData.parentNode.parentNode, eventData.parentNode.parentNode.querySelector("[data-info='qtyInput']").value);
             }
@@ -5048,7 +3319,7 @@
             //         }
             //     }
             // }
-
+            const prevStationId = adjacentStationIds[id][0];
             const stationIds = [];
             for (var item in adjacentStationIds) {
                 if (adjacentStationIds[item][0] !== "" && adjacentStationIds[item][0] !== undefined) {
@@ -5145,6 +3416,10 @@
 
             fw.fireEvent("EventTransaction", { ID: id, EventType: 3, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: "", Value: "" });
             fw.fireEvent("SaveTimeWindow", { id, locationId });
+            fw.func("PUBLISHCLIENT", "updateMapItemStationId", {
+                prevStationId,
+                stationId: cardSelected.querySelector("[data-info='stationInput']").value,
+            });
 
             rowState[id].Location = cardSelected.querySelector("[data-info='setLocation']").value;
             rowState[id].StationId = cardSelected.querySelector("[data-info='stationInput']").value;
@@ -5166,7 +3441,7 @@
                 RemoveDevice();
             });
             ResetSiteIRCancel();
-            if(document.querySelectorAll('tbody tr > div').length === 1) {
+            if (document.querySelectorAll('tbody tr > div').length === 1) {
                 const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
                 siteClearScreen.querySelector('.bi-arrow-bar-down').style.cursor = 'default';
                 siteClearScreen.querySelector('.bi-arrow-bar-down').parentNode.style.opacity = '0.3';
@@ -5183,6 +3458,7 @@
         function RemoveDevice() {
 
             var id = cardSelected.parentNode.getAttribute("data-id");
+            const stationId = adjacentStationIds[id][0];
             var dbVal = {};
             dbVal[id] = {
                 "Id": id,
@@ -5247,6 +3523,10 @@
             cardSelected.querySelector("[data-section='clearScreen']").style.setProperty("display", "none");
             cardSelected.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
             cardSelected.querySelector("[data-section='clearScreen']").querySelector("[data-section='Actions']").querySelector("[data-section='ordinaryFormBtn']").style.setProperty("display", "");
+            fw.func("PUBLISHCLIENT", "updateMapItemStatus", {
+                stationId,
+                status: '0',
+            });
 
         }
         function DeleteDevice(event) {
@@ -5360,6 +3640,11 @@
             })
         }
 
+        function setModelConfigurations(eventData) {
+            modelConfigurations = [];
+            modelConfigurations = eventData.value;
+        }
+
         function setModels(eventData) {
             models = [];
             models = eventData.value;
@@ -5379,13 +3664,13 @@
             screenForm.querySelector("[data-form='ResetIR']").style.setProperty("display", "none");
             screenForm.querySelector("[data-form='RemoveDevice']").style.setProperty("display", "none");
 
-            var deviceTypes;
+            var deviceTypes = [];
             activeDropdowndataSources.forEach(x => {
                 if (x.Name === "DeviceTypes") {
                     deviceTypes = PackageData(x);
                 }
             });
-            SetSelectValues(deviceTypes, "DeviceTypes");
+            // SetSelectValues(deviceTypes, "DeviceTypes");
             var i = 1;
             var selectedDeviceType;
 
@@ -5480,29 +3765,29 @@
                 fw.fireEvent("EventTransaction", { ID: id, EventType: 4, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: item.CompanyProductId, Value: '0' });
             }
             CancelObservation();
-            input.value=10;
-            event.target.parentNode.parentNode.querySelector('[data-info="RepeatCheckbox"][name="baitTakenYes"]').checked=false;
+            input.value = 10;
+            event.target.parentNode.parentNode.querySelector('[data-info="RepeatCheckbox"][name="baitTakenYes"]').checked = false;
             event.target.parentNode.parentNode.parentNode.querySelector("[data-form='formObservation']")
                 .querySelector('div').querySelectorAll('.flex')[1].style.display = 'none'
             event.target.parentNode.parentNode.parentNode.querySelector("[data-form='formObservation']")
                 .querySelector('div').querySelectorAll('.flex')[2].style.display = 'none';
-            if(event.target.parentNode.parentNode.querySelector('[data-info="RepeatCheckbox"][name="openAddBait"]').checked){                
-            var baitButton = event.target.parentNode.parentNode.parentNode.parentNode.querySelector('[data-info="baitIcon"]');
-            baitButton.dispatchEvent(new Event('click'));
+            if (event.target.parentNode.parentNode.querySelector('[data-info="RepeatCheckbox"][name="openAddBait"]').checked) {
+                var baitButton = event.target.parentNode.parentNode.parentNode.parentNode.querySelector('[data-info="baitIcon"]');
+                baitButton.dispatchEvent(new Event('click'));
             }
         }
 
-        function  BaitPerChange(event) {
+        function BaitPerChange(event) {
             const remainder = parseInt(event.target.value) % 10;
             const quotient = parseInt(event.target.value) / 10;
-            if(remainder == '1') {
-                if(event.target.value == '101') {
+            if (remainder == '1') {
+                if (event.target.value == '101') {
                     event.target.value = 100;
                 } else {
                     event.target.value = (parseInt(quotient) + 1) * 10;
                 }
             } else {
-                if(parseInt(quotient)) {
+                if (parseInt(quotient)) {
                     event.target.value = parseInt(quotient) * 10;
                 } else {
                     event.target.value = 10;
@@ -5515,13 +3800,13 @@
             noCheckBox.checked = !event.target.checked;
             const question2 = cardSelected.querySelector('[data-info="observationQ2"]');
             const question3 = cardSelected.querySelector('[data-info="observationQ3"]');
-            if(event.target.name === 'baitTakenYes') {
-                if(!event.target.checked) {
-                    if(question2) question2.parentNode.style.display = 'none';
-                    if(question3) question3.parentNode.style.display = 'none';
+            if (event.target.name === 'baitTakenYes') {
+                if (!event.target.checked) {
+                    if (question2) question2.parentNode.style.display = 'none';
+                    if (question3) question3.parentNode.style.display = 'none';
                 } else {
-                    if(question2) question2.parentNode.style.display = '';
-                    if(question3) question3.parentNode.style.display = '';
+                    if (question2) question2.parentNode.style.display = '';
+                    if (question3) question3.parentNode.style.display = '';
                 }
             }
         }
@@ -5529,8 +3814,8 @@
         function NoClicked(event) {
             const yesCheckBox = event.target.parentNode.parentNode.querySelectorAll('input')[0];
             yesCheckBox.checked = !event.target.checked;
-            if(event.target.name === 'baitTakenNo') {
-                if(event.target.checked) {
+            if (event.target.name === 'baitTakenNo') {
+                if (event.target.checked) {
                     cardSelected.querySelector("[data-form='formObservation']")
                         .querySelector('div').querySelectorAll('.flex')[1].style.display = 'none'
                     cardSelected.querySelector("[data-form='formObservation']")
@@ -5541,22 +3826,25 @@
                     cardSelected.querySelector("[data-form='formObservation']")
                         .querySelector('div').querySelectorAll('.flex')[2].style.display = ''
                 }
-                
+
             }
         }
 
         function AddSiteBait(current) {
             event.currentTarget.parentNode.parentNode.style.setProperty("display", "");
-            document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
-                element.style.setProperty("display", "none");
-            });
             siteSelectedDevices = [];
             siteBaitEnabled = true;
             closeAllOpenDeviceCards();
-            document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
-                siteSelectedDevices.push(element.getAttribute('data-id'));
-                element.querySelector('[data-section="main"]').classList.add('disableHover');
-            })
+            document.querySelector('tbody').querySelector('tr')
+                .querySelectorAll('div[data-id]').forEach(element => {
+                    const baitEnabled = element.getAttribute('data-bait-enabled');
+                    if(baitEnabled === '1') {
+                        siteSelectedDevices.push(element.getAttribute('data-id'));
+                        element.querySelector('[data-section="main"]').classList.add('disableHover');
+                    } else {
+                        element.style.setProperty("display", "none");
+                    }
+                });
             // var id = cardSelected.parentNode.getAttribute("data-id");
             // var form = cardSelected.querySelector("[data-section='formScreen']");
             // cardSelected.querySelector("[data-info='RepeatCheckbox']").checked = false;
@@ -5620,8 +3908,8 @@
                 }
             }
             else if (deviceType.value === "1") {
-                var selectedModel=siteClearScreen.querySelector('[data-select="Device"]').selectedOptions[0].innerHTML;
-                fw.func("PUBLISHCLIENT", "GenericActionMessage", "GoTo|Provisioning Step 1|AddDevice|true|SelectedModel|"+selectedModel);
+                var selectedModel = siteClearScreen.querySelector('[data-select="Device"]').selectedOptions[0].innerHTML;
+                fw.func("PUBLISHCLIENT", "GenericActionMessage", "GoTo|Provisioning Step 1|AddDevice|true|SelectedModel|" + selectedModel);
             }
         }
 
@@ -5789,7 +4077,7 @@
         }
 
         function CancelBait(current) {
-            if(current) {
+            if (current) {
                 current.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.setProperty("display", "none");
                 event.currentTarget.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
                 cardSelected.querySelector("[data-section='clearScreen']").querySelector("[data-section='Actions']").querySelector("[data-section='ordinaryFormBtn']").style.setProperty("display", "");
@@ -5802,19 +4090,31 @@
             siteClearScreen.querySelector("[data-info='btnSmart']").style.setProperty("display", "");
             siteSelectedDevices = [];
             siteBaitEnabled = false;
-            document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
-                element.style.setProperty("display", "");
-            });
-            document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
-                element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
-                element.querySelector('[data-section="main"]').classList.remove('disableHover');
-            });
+            document.querySelector('tbody').querySelector('tr')
+                .querySelectorAll('div[data-id]').forEach(element => {
+                    const baitEnabled = element.getAttribute('data-bait-enabled');
+                    if(baitEnabled === '1') {
+                        element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
+                        element.querySelector('[data-section="main"]').classList.remove('disableHover');
+                    } else {
+                        element.style.setProperty("display", "");
+                    }
+                });
             siteClearScreen.querySelector("[data-select='BaitType']").value = DefaultActiveCardProduct.Name;
             siteClearScreen.querySelector("[data-info='qtyInput']").value = 1;
             QtySet = 1;
             var temp = DefaultActiveCardProduct.WeightPerBlock;
             siteClearScreen.querySelector("[data-value='QtyLabel']").innerHTML = Math.round((parseInt(QtySet) * temp), 2) + " / " + ((parseInt(QtySet) * temp) * 0.035274).toString().substr(0, 3);
             siteClearScreen.querySelector("[data-info='expiryDate']").value = 'dd-mm-yyyy';
+        }
+
+        function DeviceTypeChanged(element) {
+            const deviceId = element.closest("[data-id]").getAttribute("data-id");
+            configChangedDeviced = deviceId;
+            fw.func("PUBLISHCLIENT", "updateDeviceConfig", {
+                deviceId,
+                configId: element.value,
+            });            
         }
 
         function CancelSiteAddDevice(event) {
@@ -5833,7 +4133,7 @@
             } else {
                 disableTimeWindowFilter();
             }
-            if(cardSelected) {
+            if (cardSelected) {
                 var id = cardSelected.parentNode.getAttribute("data-id");
                 BindChartData(rowState[id].DeviceNumber);
             }
@@ -5841,21 +4141,21 @@
 
         /**
          * function to disable the time window filtering.
-         */ 
+         */
         function disableTimeWindowFilter() {
             timeWindowEnabled = false;
         }
 
         /** 
          * function to enable the time window filtering.
-         */ 
+         */
         function enableTimeWindowFilter() {
             timeWindowEnabled = true;
         }
 
         /**
          * 
-         */ 
+         */
         function setTimeWindowDates(eventData) {
             var values = eventData.value.split(",");
             var start = [];                                             // container for date params
@@ -5913,6 +4213,8 @@
             }
 
             var card = rowElems[id];
+            const shadowRoot = card.shadowRoot;
+            if (shadowRoot) card = shadowRoot;
             var sideStatus = card.querySelector("[data-info='SideBarStatus'");
             var icon = card.querySelector("[data-info='icon']");
             var hours = card.querySelector("[data-value='Hours']");
@@ -6386,25 +4688,52 @@
                     var statusIndex = collection._columnMap.Status;
                     var baitEnabledIndex = collection._columnMap.BaitEnalbed;
                     var modelIdIndex = collection._columnMap.ModelId;
+                    var modelConfigIdIndex = collection._columnMap.ModelConfigurationId;
                     let iconUrl = '';
                     const model = models.find(model => model.id === collection.data[parseInt(rowKeys[i])][modelIdIndex]);
                     if (model) {
                         iconUrl = model.iconUrl;
                     }
                     const modelType = modelTypes.find(modelType => modelType.id === model.modelType);
-                    AddCardChild(rowKeys[i], card, cardSelectedParent,
-                        collection.data[parseInt(rowKeys[i])][statusIndex] ?
-                            collection.data[parseInt(rowKeys[i])][statusIndex] : '0',
-                        collection.data[parseInt(rowKeys[i])][baitEnabledIndex] ?
-                            collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1',
-                        iconUrl,
-                        modelType?.isSmart,
-                        {
-                            question1: modelType.question1,
-                            question2: modelType.question2,
-                            question3: modelType.question3,
-                        }
-                    );
+                    const deviceConfiguration = modelConfigurations.find(configuration => configuration.id === collection.data[parseInt(rowKeys[i])][modelConfigIdIndex]);
+                    if (deviceConfiguration && deviceConfiguration.type === 'SnapTrap') {
+                        const trap = document.createElement("snap-trap");
+                        const div = document.createElement('div');
+                        div.appendChild(trap);
+                        div.setAttribute("data-id", rowKeys[i]);
+                        rowElems[rowKeys[i]] = div.firstChild;
+
+                        const deviceData = {};
+                        Object.keys(collection._columnMap).forEach((key, index) => {
+                            deviceData[key] = collection.data[parseInt(rowKeys[i])][index];
+                        });
+                        
+                        trap.setGeneralInfo(
+                            rowKeys[i], 
+                            deviceData, 
+                            deviceConfiguration.iconURL, 
+                            JSON.parse(modelType.settings),
+                            modelConfigurations.filter(config => config.modelId === model.id),
+                            model,
+                        );
+
+                    } else {
+                        AddCardChild(rowKeys[i], card, cardSelectedParent,
+                            collection.data[parseInt(rowKeys[i])][statusIndex] ?
+                                collection.data[parseInt(rowKeys[i])][statusIndex] : '0',
+                            collection.data[parseInt(rowKeys[i])][baitEnabledIndex] ?
+                                collection.data[parseInt(rowKeys[i])][baitEnabledIndex] : '1',
+                            iconUrl,
+                            modelType?.isSmart,
+                            {
+                                question1: modelType.question1,
+                                question2: modelType.question2,
+                                question3: modelType.question3,
+                            },
+                            modelConfigurations.filter(config => config.modelId === model.id),
+                            collection.data[parseInt(rowKeys[i])][modelConfigIdIndex]
+                        );
+                    }
                     rowState[rowKeys[i]] = {};
                     rowState[rowKeys[i]]["rowId"] = rowKeys[i];
 
@@ -6614,9 +4943,9 @@
 
                                 break;
                             case "BaitTypeName":
+                                var baitTypeNameIndex = collection._columnMap.Name;
                                 if (collection.data[rowKeys[i]][j] !== "") {
-
-                                    card.querySelector("[data-value='FoodName']").innerHTML = collection.data[rowKeys[i]][37];
+                                    card.querySelector("[data-value='FoodName']").innerHTML = collection.data[rowKeys[i]][baitTypeNameIndex];
                                 } else {
                                     card.querySelector("[data-value='FoodName']").innerHTML = "--";
                                 }
@@ -6943,6 +5272,10 @@
                 //}
                 var companyProductIdIndex = collection._columnMap.CompanyProductId;
                 rowState[rowKeys[i]]["CompanyProductId"] = collection.data[parseInt(rowKeys[i])][companyProductIdIndex];
+                const model = models.find(model => model.id === collection.data[parseInt(rowKeys[i])][collection._columnMap.ModelId]);
+                if (model.name === 'SnapTrap') {
+
+                }
             }
 
             const siteClearScreen = document.querySelector('[data-section="siteClearScreen"]');
@@ -6975,6 +5308,15 @@
             //fw_feed(null, null, null);
             //  ChangeCardHeaderType(1);
             ChangeHeaderValue();
+            // if(configChangedDeviced) {
+            //     const device = document.querySelector(`[data-id="${configChangedDeviced}"]`);
+            //     const snapTrap = device.querySelector('snap-trap');
+            //     if(snapTrap) {
+            //         snapTrap.shadowRoot.querySelector('[data-section="main"]').click();
+            //     } else {
+            //         device.querySelector('[data-section="main"]').click();
+            //     }
+            // }
         }
 
 
@@ -7297,8 +5639,8 @@
                 endDate = new Date(endDate).toISOString();
                 startDate = startDate.toISOString();
 
-                if(timeWindowEnabled) {
-                    if(new Date(timeWindowStartDate) < new Date(endDate)) {
+                if (timeWindowEnabled) {
+                    if (new Date(timeWindowStartDate) < new Date(endDate)) {
                         fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/WEIGHT", "WEIGHT", new Date(timeWindowStartDate).toISOString(), startDate);         // request data from server
                         fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/BAITTAKEN", "BAITTAKEN", new Date(timeWindowStartDate).toISOString(), startDate);         // request data from server
                         fw.func("history", "PESTCO/RODENTS/" + deviceName.toUpperCase() + "/COUNTERTOTAL", "COUNTERTOTAL", new Date(timeWindowStartDate).toISOString(), startDate);         // request data from server
@@ -8100,7 +6442,7 @@
         function SetCardLineColorNoThreshold(card, colorValue, querySelector) {
 
             colorValue = parseInt(colorValue);
-            if (colorValue != 1 && colorValue != 2 && colorValue != 3 && colorValue != 4 || isNaN(colorValue)){
+            if (colorValue != 1 && colorValue != 2 && colorValue != 3 && colorValue != 4 || isNaN(colorValue)) {
                 colorValue = 1;
             }
             card.querySelector("[data-info='" + querySelector + "']").setAttribute("class", CardStateUnderlineColor[colorValue]);
@@ -8230,7 +6572,7 @@
                 if (packet === 2 || packet.value === 2) {
 
                     card.querySelector("[data-info='lbl1']").innerHTML = "URGENT";
-                    card.querySelector("[data-info='lbl2']").innerHTML = "IMPORTANT";
+                    card.querySelector("[data-info='lbl2']").innerHTML = "IMPORT ANT";
                     card.querySelector("[data-info='lbl3']").innerHTML = "NO ACTIVITY";
                     card.querySelector("[data-value='Urgent']").innerHTML = currentRow["Urgent"];
                     card.querySelector("[data-value='Important']").innerHTML = currentRow["Important"];
@@ -8246,7 +6588,7 @@
                 else {
 
                     card.querySelector("[data-info='lbl1']").innerHTML = "URGENT";
-                    card.querySelector("[data-info='lbl2']").innerHTML = "IMPORTANT";
+                    card.querySelector("[data-info='lbl2']").innerHTML = "IMPORT ANT";
                     card.querySelector("[data-info='lbl3']").innerHTML = "NO ACTIVITY";
                     card.querySelector("[data-value='Urgent']").innerHTML = currentRow["Danger"];
                     card.querySelector("[data-value='Important']").innerHTML = currentRow["Attention"];
@@ -8385,7 +6727,7 @@
         }
 
 
-        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl, isSmart, questions) {
+        function AddCardChild(id, card, parent, status, baitEnabled, iconUrl, isSmart, questions, configurations, configId) {
 
             var cardBody = parent.querySelector("[data-selector='Traps']");
             var row = document.createElement("div");
@@ -8420,6 +6762,22 @@
                         card.querySelector('[data-info="observationQ3"]').innerHTML = questions.question3;
                     } else {
                         card.querySelector('[data-info="observationQ3"]').parentNode.remove();
+                    }
+                }
+            }
+            if(configurations.length > 0) {
+                const setForm = card.querySelector('[data-form="formSet"]');
+                if(setForm) {
+                    const deviceTypesSelect = setForm.querySelector('[data-select="DeviceTypes"]');
+                    if(deviceTypesSelect) {
+                        deviceTypesSelect.innerHTML = ''
+                        configurations.forEach(config => {
+                            const option = document.createElement('option');
+                            option.value = config.id;
+                            option.innerHTML = config.type;
+                            deviceTypesSelect.appendChild(option);
+                        });
+                        if(configId) deviceTypesSelect.value = configId;
                     }
                 }
             }
@@ -8719,6 +7077,8 @@
         function closeAllOpenDeviceCards() {
             document.querySelector('tbody').querySelector('tr')
                 .querySelectorAll('div[data-id]').forEach(element => {
+                    if(element.querySelector('snap-trap'))
+                        element = element.querySelector('snap-trap').shadowRoot;
                     element.querySelector('[data-section="clearScreen"]').style.setProperty("display", "none")
                 });
         }
@@ -8735,9 +7095,9 @@
                 toggle.classList.remove('rotate');
                 siteSelectedDevices = [];
                 siteBaitEnabled = false;
-                document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
-                    element.style.setProperty("display", "");
-                });
+                // document.querySelectorAll("[data-bait-enabled='0']").forEach(element => {
+                //     element.style.setProperty("display", "");
+                // });
                 document.querySelectorAll("[data-bait-enabled='1']").forEach(element => {
                     element.querySelector('[data-section="main"]').classList.remove("whiteBackgroundCard");
                     element.querySelector('[data-section="main"]').classList.remove('disableHover');
@@ -9363,6 +7723,993 @@
             var newDate = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
             return newDate;
         }
+
+        class SnapTrap extends HTMLElement {
+            constructor() {
+                super();
+                this._state = Object.seal({
+                    id: null,
+                    isSmart: null,
+                    settings: null,
+                });
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = `
+                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+                <link href="/widgets/Rodent.css" rel="stylesheet">
+                <div>
+                    <div data-section="main" data-info="SideBarStatus" data-value="triggered" class="normalCardBorder SideBarGreen"
+                        style="font-family: sans-serif;border-radius:2px; padding: 8px; overflow:hidden;z-index:130;">
+                        <div data-section="cell">
+                            <div>
+                                <div class="container flex" style="margin: 8px 8px 4px 0;  ">
+
+                                    <!--<div data-info="SideBarStatus" class="SideBarGreen">
+
+                                    </div>-->
+                                    <!--Dummy Trap Icon start-->
+                                    <div style="border-right: 0.98px solid #9b9b9bff;width:99%;">
+                                        <span data-value="DeviceNumber" class="PositionNumber">--</span>
+                                        <div class="iconDeviceError" data-info="deviceErrorStatus" style="display:none">
+
+                                            <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+                                                xmlns:cc="http://creativecommons.org/ns#"
+                                                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                                                xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+                                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="18px"
+                                                height="18px" viewBox="0 0 3.1593108 10.265815" version="1.1" id="svg46764"
+                                                inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+                                                sodipodi:docname="Exclamation.svg">
+                                                <defs id="defs46758" />
+
+
+                                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                                    transform="translate(-57.384632,-79.444472)">
+                                                    <path
+                                                        d="m 60.027039,88.133224 a 1.0627789,1.060213 0 0 1 -1.059222,1.060208 1.0627789,1.060213 0 0 1 -1.066312,-1.053111 1.0627789,1.060213 0 0 1 1.052085,-1.067256 1.0627789,1.060213 0 0 1 1.073354,1.045967"
+                                                        sodipodi:open="true" sodipodi:end="6.2697986" sodipodi:start="0"
+                                                        sodipodi:ry="1.060213" sodipodi:rx="1.0627789" sodipodi:cy="88.133224"
+                                                        sodipodi:cx="58.96426" sodipodi:type="arc" id="path28027"
+                                                        style="opacity:1;fill:#d74423;fill-opacity:1;stroke:#d74423;stroke-width:1.03369844;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+                                                        inkscape:export-filename="C:\Users\fredy\Documents\Sensavation\Pest\UI Elements\mbb.png"
+                                                        inkscape:export-xdpi="96" inkscape:export-ydpi="96"
+                                                        inkscape:transform-center-x="0.22674155"
+                                                        inkscape:transform-center-y="-5.2179916" />
+                                                    <path inkscape:transform-center-y="1.645522"
+                                                        inkscape:transform-center-x="17.617202" inkscape:connector-curvature="0"
+                                                        id="path28029" d="m 58.888664,84.311469 -0.0247,-3.515579"
+                                                        style="fill:#d74423;fill-opacity:1;stroke:#d74423;stroke-width:2.66488314;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <div class="iconCommunicationError" data-info="communicationErrorStatus"
+                                            style="display:none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#d74423"
+                                                class="bi bi-wifi-off" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M10.706 3.294A12.545 12.545 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c.63 0 1.249.05 1.852.148l.854-.854zM8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065 8.448 8.448 0 0 1 3.51-1.27L8 6zm2.596 1.404.785-.785c.63.24 1.227.545 1.785.907a.482.482 0 0 1 .063.745.525.525 0 0 1-.652.065 8.462 8.462 0 0 0-1.98-.932zM8 10l.933-.933a6.455 6.455 0 0 1 2.013.637c.285.145.326.524.1.75l-.015.015a.532.532 0 0 1-.611.09A5.478 5.478 0 0 0 8 10zm4.905-4.905.747-.747c.59.3 1.153.645 1.685 1.03a.485.485 0 0 1 .047.737.518.518 0 0 1-.668.05 11.493 11.493 0 0 0-1.811-1.07zM9.02 11.78c.238.14.236.464.04.66l-.707.706a.5.5 0 0 1-.707 0l-.707-.707c-.195-.195-.197-.518.04-.66A1.99 1.99 0 0 1 8 11.5c.374 0 .723.102 1.021.28zm4.355-9.905a.53.53 0 0 1 .75.75l-10.75 10.75a.53.53 0 0 1-.75-.75l10.75-10.75z" />
+                                            </svg>
+                                        </div>
+                                        <div class="deviceIcon">
+                                            <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+                                                xmlns:cc="http://creativecommons.org/ns#"
+                                                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                                                xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+                                                id="svg29831" version="1.1" viewBox="0 0 16.933333 16.933333" height="25" width="25"
+                                                data-info="iconDummy" style="margin-top: 12px; display:none;">
+                                                <g id="g25716" transform="matrix(0.35356524,0,0,-0.35271157,-872.43975,177.40608)">
+                                                    <g transform="translate(2609.6979,-736.76742)" id="g9647-9-8-80">
+                                                        <path id="path6880-7-3-8-0-4-0"
+                                                            d="m -97.915822,1213.08 v -17.9842 H -138.3176 v 40.8342 h 40.031118 v -6.7954"
+                                                            style="fill:none;stroke:#41505a;stroke-width:7.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+                                                        </path>
+                                                    </g>
+                                                    <path transform="scale(1,-1)"
+                                                        style="opacity:1;fill:#41505a;fill-opacity:1;stroke:#41505a;stroke-width:2.27642;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+                                                        id="path24990-4"
+                                                        d="m 2493.9189,-478.74548 a 2.3376312,2.3376312 0 0 1 -2.3298,2.33761 2.3376312,2.3376312 0 0 1 -2.3454,-2.32197 2.3376312,2.3376312 0 0 1 2.3141,-2.35316 2.3376312,2.3376312 0 0 1 2.3609,2.30622 l -2.3374,0.0313 z">
+                                                    </path>
+                                                </g>
+                                            </svg>
+                                            <!--Dummy Trap Icon end-->
+                                            <!--Smart Trap Icon start-->
+                                            <img data-info="iconSmart" style="margin-top: 15px;" />
+                                            <!--Smart Trap Icon end-->
+                                            <!--Smart Trap Error Icon start-->
+                                            <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+                                                xmlns:cc="http://creativecommons.org/ns#"
+                                                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                                                xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+                                                id="svg29831" version="1.1" viewBox="0 0 16.933333 16.933333" height="25" width="25"
+                                                data-info="iconSmartError" style="margin-top: 12px; display:none;">
+
+
+                                                <g id="g8372" transform="translate(-161.98269,-24.891438)">
+                                                    <path
+                                                        style="fill:none;stroke:#41505a;stroke-width:2.64854;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+                                                        d="m 177.57657,34.252709 v 6.343234 H 163.2919 V 26.193249 h 14.15362 v 2.396816"
+                                                        id="path6880-7-3-8-0-4-0-8-2"></path>
+                                                    <path
+                                                        style="opacity:1;fill:#d74423;fill-opacity:1;stroke:#d74423;stroke-width:0.80389;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+                                                        id="path24990-4-4-5"
+                                                        d="m 171.5802,33.613804 a 0.82650512,0.82450956 0 0 1 -0.82374,0.824505 0.82650512,0.82450956 0 0 1 -0.82925,-0.818986 0.82650512,0.82450956 0 0 1 0.81818,-0.829987 0.82650512,0.82450956 0 0 1 0.83473,0.813431 l -0.82643,0.01104 z">
+                                                    </path>
+                                                    <path
+                                                        style="fill:#000000;fill-opacity:0;stroke:#d74423;stroke-width:2.03333;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+                                                        d="m 170.76591,31.121397 -0.0244,-2.082158"
+                                                        id="path5448-9-8-5-3-9-4-6-7-4-7-9-0"></path>
+                                                </g>
+
+                                            </svg>
+                                            <!--Smart Trap Error Icon end-->
+                                            <!--Smart Trap No Signal Icon start-->
+                                            <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+                                                xmlns:cc="http://creativecommons.org/ns#"
+                                                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                                                xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+                                                id="svg29831" version="1.1" viewBox="0 0 16.933333 16.933333" height="25" width="25"
+                                                data-info="iconSmartNoSignal" style="margin-top: 12px; display:none;">
+
+                                                <g id="g9056" transform="matrix(1.0067255,0,0,1,-118.44967,13.27514)">
+                                                    <g id="g7816-3-6-0-8-5-0"
+                                                        transform="matrix(0.35033854,0,0,-0.35033854,228.02635,420.82483)">
+                                                        <path
+                                                            style="fill:none;stroke:#41505a;stroke-width:7.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+                                                            d="m -270.79532,1212.4821 v -17.9842 h -40.40178 v 40.8342 h 40.03112 v -6.7954"
+                                                            id="path6880-5-6-9-2-2-6"></path>
+                                                    </g>
+                                                    <g id="g9048">
+                                                        <path id="path24992-2"
+                                                            d="m 123.63093,-4.6294193 c 0.18935,-1.551448 1.17605,-2.122453 2.46901,-2.1975"
+                                                            style="fill:none;fill-opacity:1;stroke:#d74423;stroke-width:0.840507;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+                                                        </path>
+                                                        <path
+                                                            style="opacity:1;fill:#d74423;fill-opacity:1;stroke:#d74423;stroke-width:0.797517;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+                                                            id="path24990-5-3"
+                                                            d="m 126.89816,-4.4328383 a 0.81896233,0.81896233 0 0 1 -0.81622,0.818958 0.81896233,0.81896233 0 0 1 -0.82169,-0.813476 0.81896233,0.81896233 0 0 1 0.81073,-0.8244 0.81896233,0.81896233 0 0 1 0.82711,0.807954">
+                                                        </path>
+                                                        <path
+                                                            style="fill:none;fill-opacity:1;stroke:#d74423;stroke-width:1.02335;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+                                                            d="m 121.96033,-4.8955463 c 0.16235,-0.933719 0.45653,-1.655931 0.85377,-2.203141 0.74784,-1.030088 1.86097,-1.440044 3.14763,-1.473421"
+                                                            id="path24992-1-6-7"></path>
+                                                    </g>
+                                                </g>
+                                            </svg>
+                                            <div class="StationId">
+                                                <span class="StationId StationLabel" data-value="StationId" aria></span>
+                                            </div>
+
+                                        </div>
+
+                                        <!--Smart Trap No Signal Icon start-->
+                                        <!--<div data-info="icon" class="redIcon vertical-center" style="display: inline-block; width: 25px; height: 25px;"></div>-->
+                                        <div class="vertical-center setupContent">
+                                            <div class="row">
+                                                <span data-value="Status" style="margin-right: 6px;"
+                                                    class="capitalize StatusIndicator"></span>
+                                            </div>
+                                            <div class="row CardLabels">
+                                                <div data-value="DeviceName" class="capitalize" style=" font-size: 12.5px">
+                                                    --
+                                                </div>
+
+                                                <div data-value="Address"
+                                                    style="display:inline-block;word-wrap:break-word;font-size: 10.5px;">
+                                                    --
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div data-info="losenzes" style="float: right; margin-right: -12px; display: flex; width:100%; z-index:140;">
+                                        <div data-info="state" class="displayContainer" style="text-align: center;margin-left: 6px; width:100%; display: none;">
+                                            <span data-value="Dial" class="ValueStyle">
+                                                --
+                                            </span>
+                                            <div class="UnderlineGray" data-info="UnderlineState" style="width: 100%;">
+                                                <span data-value="status1Pos" class="underlineIndicatorLeft"></span>
+                                            </div>
+                                            <span class="LabelStyle">STATE</span>
+                                        </div>
+                                        <div data-info="probability" class="displayContainer" style="text-align: center;margin-left: 6px; width:100%; display: none;">
+                                            <span data-value="Consumed" class="ValueStyle">
+                                                --
+                                            </span>
+                                            <div class="UnderlineGray" data-info="UnderlineProbability" style="width: 100%;">
+                                                <span data-value="status4Pos" class="underlineIndicatorLeft"></span>
+                                            </div>
+                                            <span class="LabelStyle">PROBAB ILITY</span>
+                                        </div>
+                                        <div data-info="motion" class="displayContainer"
+                                            style="text-align: center;margin-left: 10px; width:100%; display: none;">
+                                            <span data-value="Hours" class="ValueStyle">
+                                                --
+                                            </span>
+                                            <div class="UnderlineGray" data-info="UnderlineHours" style="width:100%;">
+                                                <span data-value="status2Pos" class="underlineIndicatorLeft"></span>
+                                            </div>
+                                            <span class="LabelStyle">MOTION</span>
+                                        </div>
+                                        <div data-info="duration" class="displayContainer"
+                                            style="text-align: center;margin-left: 10px; width:100%; display: none;">
+                                            <span data-value="Duration" class="ValueStyle">
+                                                --
+                                            </span>
+                                            <div class="UnderlineGray" data-info="UnderlineDuration" style="width:100%;">
+                                                <span data-value="status2Pos" class="underlineIndicatorLeft"></span>
+                                            </div>
+                                            <span class="LabelStyle">DURA TION</span>
+                                        </div>
+                                        <br />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div data-section="clearScreen" onclick="event.stopPropagation()"
+                            style="width:100%;background-color: #41505aff;border: 1px solid #bfbfbf; overflow: hidden; display: none;">
+                            <div data-info="btnActionsCtl" class="flex" style="width:100%; ">
+                                <a id="devAction" href="#" class="tabBtnSelected" data-info="btnActions" style="width:50%;"
+                                    onclick="OpenActions(event)">
+                                    Actions
+                                </a>
+                                <a id="devInfo" href="#" class="tabBtn" data-info="btnInfo" style="width:50%;"
+                                    onclick="OpenDeviceInfo(event)">
+                                    Device Info
+                                </a>
+                            </div>
+                            <div data-section="Actions">
+                                <div data-section="SnapTrapDevice">
+                                    <div class="row" onclick="event.stopPropagation()">
+                                        <div class="container-fluid" data-info="actionButtons">
+                                            <div class="row flex flexItemHolder">
+                                                <div class="flexItem" data-info="SET" style="display: none;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" onclick="SetDeviceCard(event)"
+                                                        width="16" height="16" fill="currentColor"
+                                                        class="bi bi-arrow-bar-down iconGrid" viewBox="0 0 16 16">
+                                                        <path fill="white" fill-rule="evenodd"
+                                                            d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z" />
+                                                    </svg>
+                                                    <p style="color:white;" class="fixMargin">SET</p>
+                                                </div>
+                                                <div class="flexItem" data-info="REMOVE" style="display: none;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" onclick="StartRemove(event)" width="16"
+                                                        height="16" fill="currentColor" class="bi bi-arrow-bar-up iconGrid"
+                                                        viewBox="0 0 16 16">
+                                                        <path fill="white" fill-rule="evenodd"
+                                                            d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z" />
+                                                    </svg>
+                                                    <p style="color:white;" class="fixMargin">REMOVE</p>
+                                                </div>
+                                            </div>
+                                            <div class="row flex flexItemHolder">
+                                                <div class="flexItem" data-info="CLEAR" style="display: none;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-x-circle iconGrid" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                    </svg>
+                                                    <p style="color:white;" class="fixMargin">CLEAR</p>
+                                                </div>
+                                                <div class="flexItem" data-info="CHECK" style="display: none;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-check-circle iconGrid" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                                                    </svg>
+                                                    <p style="color:white;" class="fixMargin">CHECK</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-section="formScreen" onclick="event.stopPropagation()"
+                                    style="background-color: rgb(65, 80, 90); border: 1px solid #bfbfbf; margin-top: 15px; display: none;">
+                                    <div data-form="formSet" style="display:none;">
+                                        <div style="margin-top:10px;">
+                                            <div style="margin-top: 10px; ">
+                                                <label>Configuration</label>
+                                                <select data-select="DeviceTypes" onchange="DeviceTypeChanged(this)"
+                                                    class="select-css" style="margin-top: 15px; background: #646c83; ">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+
+                                            <div style="display:flex">
+                                                <div class="BoxLabel">
+                                                    <label for="name">Name</label>
+                                                    <div class="number-input" style="height:44px; width:100%;">
+                                                        <input type="text" id="name" class="inputDate inputText"
+                                                            data-info="setName">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Location Notes</label>
+                                                    <div class="number-input" style="height:44px; width:100%;">
+                                                        <input type="text" id="locationNotes" class="inputDate inputText"
+                                                            data-info="setLocation">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div style="display:flex">
+                                                <div class="BoxLabel" style="margin-right:0;">
+                                                    <label for="StationId">Station Id</label>
+                                                    <div style="display: flex;">
+                                                        <div class="number-input"
+                                                            style="height: 44px; width: 100%; display: flex;">
+                                                            <input class="quantity " id="StationId"
+                                                                style="width:100%;  max-width:70%;" min="0"
+                                                                data-info="stationInput" name="quantity" value="1" type="number">
+                                                            <button onclick="DecrementCounterSet(this)"
+                                                                style="border-right:1px solid white;color:white;"></button>
+                                                            <button onclick="IncrementCounterSet(this)" style="color:white;"
+                                                                class="plus"></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+
+                                            <select data-select="Quantity" class="select-css"
+                                                style="margin-top: 15px; display:none">
+                                                <option value="default" disabled selected>Quantity</option>
+                                            </select>
+                                            <div class="flex" style="overflow: auto; margin-top:8px;  ">
+
+                                                <a data-button="cancelButton" class="selectBtn"
+                                                    style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                                    CANCEL
+                                                </a>
+                                                <a data-button="submitButton" class="selectBtn"
+                                                    style="margin:0px;width:100%;">
+                                                    SAVE
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-form="formCheck" style="display:none;">
+                                        <div style="margin-top:10px;">
+                                            <div style="margin-top: 10px;">
+                                                <label>Animal Caught?</label>
+                                                <select data-select="isAnimalCaught" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                </select>
+                                            </div>
+                                            <div style="margin-top: 10px; display: none;">
+                                                <label>Select Animal Caught</label>
+                                                <select data-select="animalCaught" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+                                            <div style="margin-top: 10px; display: none;">
+                                                <label>Select Animal Sex</label>
+                                                <select data-select="animalSex" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+                                            <div style="margin-top: 10px; display: none;">
+                                                <label>Select Animal Age</label>
+                                                <select data-select="animalAge" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px; display: none;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Sub Species</label>
+                                                    <div class="number-input" style="height:44px; width:94%;">
+                                                        <input type="text" class="inputDate inputText" min="0" data-info="subSpecies">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px; display: none;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Lure Type</label>
+                                                    <div class="number-input" style="height:44px; width:94%;">
+                                                        <input type="text" class="inputDate inputText" min="0" data-info="lureType">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px; display: none;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Catch Notes</label>
+                                                    <div class="number-input" style="height:88px; width:94%;">
+                                                        <input type="text" class="inputDate inputText" data-info="catchNotes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex" style="overflow: auto; margin-top:8px;">
+                                                <a data-button="cancelButton" class="selectBtn" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                                    CANCEL
+                                                </a>
+                                                <a data-button="submitButton" class="selectBtn"
+                                                    style="margin:0px;width:100%;">
+                                                    SAVE
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div data-form="formClear" style="display:none;">
+                                        <div style="margin-top:10px;">
+                                            <div style="margin-top: 10px;">
+                                                <label>Animal Caught?</label>
+                                                <select data-select="isAnimalCaught" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                </select>
+                                            </div>
+                                            <div style="margin-top: 10px; display: none;">
+                                                <label>Select Animal Caught</label>
+                                                <select data-select="animalCaught" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+                                            <div style="margin-top: 10px; display: none;">
+                                                <label>Select Animal Sex</label>
+                                                <select data-select="animalSex" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+                                            <div style="margin-top: 10px; display: none;">
+                                                <label>Select Animal Age</label>
+                                                <select data-select="animalAge" class="select-css" 
+                                                    style="margin-top: 15px; background: #646c83;">
+                                                    <option value="default" disabled selected>Select</option>
+                                                </select>
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px; display: none;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Sub Species</label>
+                                                    <div class="number-input" style="height:44px; width:94%;">
+                                                        <input type="text" class="inputDate inputText" min="0" data-info="subSpecies">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px; display: none;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Lure Type</label>
+                                                    <div class="number-input" style="height:44px; width:94%;">
+                                                        <input type="text" class="inputDate inputText" min="0" data-info="lureType">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; margin-top: 8px; display: none;">
+                                                <div class="BoxLabel">
+                                                    <label for="locationNotes">Catch Notes</label>
+                                                    <div class="number-input" style="height:88px; width:94%;">
+                                                        <input type="text" class="inputDate inputText" data-info="catchNotes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex" style="overflow: auto; margin-top:8px;">
+                                                <a data-button="cancelButton" class="selectBtn" style="margin:0px;width:100%;border-right:1px solid #fff;">
+                                                    CANCEL
+                                                </a>
+                                                <a data-button="submitButton" class="selectBtn"
+                                                    style="margin:0px;width:100%;">
+                                                    SAVE
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+                this.deviceData = {};
+                this.bindEventListeners();
+                this.bindDropdowns();
+            }
+            bindEventListeners() {
+                const mainSection = this.shadowRoot.querySelector('[data-section="main"]');
+                const setForm = this.shadowRoot.querySelector('[data-form="formSet"]');
+                const checkForm = this.shadowRoot.querySelector('[data-form="formCheck"]');
+                const clearForm = this.shadowRoot.querySelector('[data-form="formClear"]');
+
+                if (mainSection)
+                    mainSection.addEventListener('click', () => this.toggleScreen());
+
+                const setIcon = this.shadowRoot.querySelector('[data-section="Actions"] [data-info="SET"]');
+                if (setIcon) 
+                    setIcon.addEventListener('click', () => this.setSnapTrap());
+
+                const checkIcon = this.shadowRoot.querySelector('[data-section="Actions"] [data-info="CHECK"]');
+                if (checkIcon) 
+                    checkIcon.addEventListener('click', () => this.checkSnapTrap());
+
+                const clearIcon = this.shadowRoot.querySelector('[data-section="Actions"] [data-info="CLEAR"]');
+                if (clearIcon) 
+                    clearIcon.addEventListener('click', () => this.clearSnapTrap());
+                    
+                if(setForm) {
+                    const submitButton = setForm.querySelector('[data-button="submitButton"]');
+                    if(submitButton)
+                        submitButton.addEventListener('click', () => this.submitSetForm());
+
+                    const cancelSetButton = setForm.querySelector('[data-button="cancelButton"]');
+                    if(cancelSetButton)
+                        cancelSetButton.addEventListener('click', () => this.cancelForm('formSet'));
+                }
+
+                if(checkForm) {
+                    const isAnimalCaughtSelect = checkForm.querySelector('[data-select="isAnimalCaught"]');
+                    if(isAnimalCaughtSelect)
+                        isAnimalCaughtSelect.addEventListener('change', (event) => this.isAnimalCaughtChanged(event, checkForm));
+                    
+                    const animalSelect = checkForm.querySelector('[data-select="animalCaught"]');
+                    if(animalSelect)
+                        animalSelect.addEventListener('change', (event) => this.animalCaughtChanged(event, checkForm));
+
+                    const submitButton = checkForm.querySelector('[data-button="submitButton"]');
+                    if(submitButton)
+                        submitButton.addEventListener('click', () => this.submitCheckForm());
+
+                    const cancelCheckButton = checkForm.querySelector('[data-button="cancelButton"]');
+                    if(cancelCheckButton)
+                        cancelCheckButton.addEventListener('click', () => this.cancelForm('formCheck'));
+                }
+
+                if(clearForm) {
+                    const isAnimalCaughtSelect = clearForm.querySelector('[data-select="isAnimalCaught"]');
+                    if(isAnimalCaughtSelect)
+                        isAnimalCaughtSelect.addEventListener('change', (event) => this.isAnimalCaughtChanged(event, clearForm));
+
+                    const animalSelect = clearForm.querySelector('[data-select="animalCaught"]');
+                    if(animalSelect)
+                        animalSelect.addEventListener('change', (event) => this.animalCaughtChanged(event, clearForm));
+
+                    const submitButton = clearForm.querySelector('[data-button="submitButton"]');
+                    if(submitButton)
+                        submitButton.addEventListener('click', () => this.submitClearForm());
+
+                    const cancelCheckButton = clearForm.querySelector('[data-button="cancelButton"]');
+                    if(cancelCheckButton)
+                        cancelCheckButton.addEventListener('click', () => this.cancelForm('formClear'));
+                }
+            }
+            setGeneralInfo(id, deviceData, icon, modelTypeSettings, configurations, modelSettings) {
+                this.deviceData = deviceData;
+                this.shadowRoot.querySelector('div').setAttribute("data-id", id);
+                this.shadowRoot.querySelector('[data-value="DeviceName"]').innerHTML = deviceData.DeviceName;
+                this.shadowRoot.querySelector('[data-info="setName"]').value = deviceData.DeviceName;
+                this.shadowRoot.querySelector('[data-info="stationInput"]').value = deviceData.StationId;
+                this.shadowRoot.querySelector('[data-info="setLocation"]').value = deviceData.Location;
+                this.shadowRoot.querySelector('[data-value="DeviceNumber"]').innerHTML = deviceData.DeviceNumber;
+                this.shadowRoot.querySelector('[data-value="Address"]').innerHTML = deviceData.Location;
+                this.shadowRoot.querySelector('[data-value="StationId"]').innerHTML = deviceData.StationId;
+                this.shadowRoot.querySelector('[data-info="iconSmart"]').src = icon;
+                if(deviceData.WeightConsumed){
+                    const probability = this.shadowRoot.querySelector('[data-info="probability"]');
+                    if(probability) {
+                        probability.querySelector('[data-value="Consumed"]').innerHTML = parseInt(deviceData.WeightConsumed);
+                        probability.querySelector('[data-info="UnderlineProbability"]').className = CardStateUnderlineColor[deviceData.Lozenge2];
+                    }
+                }
+                if(deviceData.Hours) {
+                    const motion = this.shadowRoot.querySelector('[data-info="motion"]');
+                    if(motion) {
+                        motion.querySelector('[data-value="Hours"]').innerHTML = parseInt(deviceData.Hours);
+                        motion.querySelector('[data-info="UnderlineHours"]').className = CardStateUnderlineColor[deviceData.Lozenge3];
+                    }
+                }
+                if(deviceData.State) {
+                    const state = this.shadowRoot.querySelector('[data-info="state"]');
+                    if(state) {
+                        if(deviceData.Lozenge1 == 2) {
+                            state.querySelector('[data-value="Dial"]').innerHTML = "SET";
+                            state.querySelector('[data-info="UnderlineState"]').className = 'UnderlineGreen';
+                        } else if(deviceData.Lozenge1 == 4) {
+                            state.querySelector('[data-value="Dial"]').innerHTML = "TRIG";
+                            state.querySelector('[data-info="UnderlineState"]').className = 'UnderlineRed';
+                        }
+                    }
+                }
+                if(deviceData.SetTime) {
+                    const duration = this.shadowRoot.querySelector('[data-info="duration"]');
+                    if(duration) {
+                        const timeDuration = new Date().getTime() - new Date(parseInt(deviceData.SetTime)).getTime();
+                        const hours = Math.round(timeDuration / (1000 * 60 * 60));
+                        duration.querySelector('[data-value="Duration"]').innerHTML = hours + 'h';
+                        if(hours > parseInt(modelSettings.duration)) {
+                            duration.querySelector('[data-info="UnderlineDuration"]').className = 'UnderlineRed';
+                        } else {
+                            duration.querySelector('[data-info="UnderlineDuration"]').className = 'UnderlineGreen';
+                        }
+                    }
+                }
+                this.bindModelTypeSettings(modelTypeSettings);
+                this.bindConfigurations(configurations, deviceData.ConfigId);
+                if(parseInt(deviceData.State) > 1) {
+                    const setIcon = this.shadowRoot.querySelector('[data-section="Actions"] [data-info="SET"]');
+                    if(setIcon)
+                        setIcon.style.visibility = 'hidden';
+                }
+            }
+            bindConfigurations(configurations, configId) {
+                if(configurations.length > 0) {
+                    const setForm = this.shadowRoot.querySelector('[data-form="formSet"]');
+                    if(setForm) {
+                        const deviceTypesSelect = setForm.querySelector('[data-select="DeviceTypes"]');
+                        if(deviceTypesSelect) {
+                            deviceTypesSelect.innerHTML = ''
+                            configurations.forEach(config => {
+                                const option = document.createElement('option');
+                                option.value = config.id;
+                                option.innerHTML = config.type;
+                                deviceTypesSelect.appendChild(option);
+                            });
+                            if(configId) deviceTypesSelect.value = configId;
+                        }
+                    }
+                }
+            }
+            bindModelTypeSettings(settings) {
+                //rendering losenzes based on model type
+                const losenzesElement = this.shadowRoot.querySelector('[data-info="losenzes"]');
+                if (settings.losenzes && settings.losenzes.length > 0 && losenzesElement) {
+                    settings.losenzes.forEach(losenze => {
+                        const losengeElement = losenzesElement.querySelector(`[data-info="${losenze}"]`);
+                        if (losengeElement) losengeElement.style.display = "";
+                    });
+                }
+                //rendering actions based on model type
+                const actionsElement = this.shadowRoot.querySelector('[data-section="Actions"]');
+                if (settings.actions && settings.actions.length > 0 && actionsElement) {
+                    settings.actions.forEach(action => {
+                        const actionElement = actionsElement.querySelector(`[data-info="${action}"]`);
+                        if (actionElement) {
+                            if(action === "CHECK") {
+                                if(this.deviceData.State === '2')
+                                    actionElement.style.display = "";
+                            } else if(action === "CLEAR") {
+                                if(this.deviceData.State === '4')
+                                    actionElement.style.display = "";
+                            } else {
+                                actionElement.style.display = "";
+                            }
+                        }
+                    });
+                }
+            }
+            toggleScreen() {
+                const clearScreen = this.shadowRoot.querySelector('[data-section="clearScreen"]');
+                if(clearScreen) {
+                    if(clearScreen.style.display === 'none') {
+                        clearScreen.style.display = '';
+                    } else {
+                        clearScreen.style.display = 'none';
+                    }                      
+                }
+            }
+            setSnapTrap() {
+                const formScreen = this.shadowRoot.querySelector("[data-section='formScreen']");
+                const actionButtons = this.shadowRoot.querySelector('[data-info="actionButtons"]');
+                if(formScreen) {
+                    const setForm = formScreen.querySelector('[data-form="formSet"]');
+                    formScreen.style.display = "";
+                    if(setForm) setForm.style.display = "";
+                    if(actionButtons) actionButtons.style.display = "none";
+                }
+            }
+            checkSnapTrap() {
+                const formScreen = this.shadowRoot.querySelector("[data-section='formScreen']");
+                const actionButtons = this.shadowRoot.querySelector('[data-info="actionButtons"]');
+                if(formScreen) {
+                    const checkForm = formScreen.querySelector('[data-form="formCheck"]');
+                    formScreen.style.display = "";
+                    if(checkForm) checkForm.style.display = "";
+                    if(actionButtons) actionButtons.style.display = "none";
+                }
+            }
+            clearSnapTrap() {
+                const formScreen = this.shadowRoot.querySelector("[data-section='formScreen']");
+                const actionButtons = this.shadowRoot.querySelector('[data-info="actionButtons"]');
+                if(formScreen) {
+                    const clearForm = formScreen.querySelector('[data-form="formClear"]');
+                    formScreen.style.display = "";
+                    if(clearForm) clearForm.style.display = "";
+                    if(actionButtons) actionButtons.style.display = "none";
+                }
+            }
+            cancelForm(form) {
+                const formScreen = this.shadowRoot.querySelector("[data-section='formScreen']");
+                const actionButtons = this.shadowRoot.querySelector('[data-info="actionButtons"]');
+                if(formScreen) {
+                    const formElement = formScreen.querySelector(`[data-form="${form}"]`);
+                    formScreen.style.display = "none";
+                    if(formElement) {
+                        formElement.style.display = "none";
+                        if(form === 'formCheck') {
+                            formElement.querySelectorAll('input').forEach(input => input.value = '');
+                            formElement.querySelectorAll('select').forEach(select => {
+                                if(select.getAttribute('data-select') === "isAnimalCaught") {
+                                    select.value = 'No';
+                                } else {
+                                    select.value = 'default';
+                                }
+                                if(select.getAttribute('data-select') === 'animalCaught') {
+                                    this.isAnimalCaughtChanged({
+                                        target: {
+                                            value: ""
+                                        }
+                                    }, formElement);
+                                    this.animalCaughtChanged({
+                                        target: {
+                                            value: ""
+                                        }
+                                    }, formElement);
+                                }
+                            });
+                        }
+                    }
+                    if(actionButtons) actionButtons.style.display = "";
+                }
+            }
+            bindDropdowns() {
+                const setForm = this.shadowRoot.querySelector("[data-section='formScreen'] [data-form='formSet']");
+                const checkForm = this.shadowRoot.querySelector("[data-section='formScreen'] [data-form='formCheck']");
+                if(lookups.length > 0) {
+                    this.shadowRoot.querySelectorAll('[data-select="isAnimalCaught"]').forEach(isAnimalCaughtSelect => {
+                        lookups.forEach(lookup => {
+                            if(lookup.key === "IsAnimalCaught") {
+                                const option = document.createElement('option');
+                                option.innerHTML = lookup.value;
+                                option.value = lookup.value;
+                                isAnimalCaughtSelect.appendChild(option);
+                            }
+                        });
+                    });
+                    if(setForm) {
+                        const trapTypeSelect = setForm.querySelector('[data-select="trapType"]');
+                        if(trapTypeSelect) {
+                            lookups.forEach(lookup => {
+                                if(lookup.key === "TrapType") {
+                                    const option = document.createElement('option');
+                                    option.innerHTML = lookup.value;
+                                    option.value = lookup.value;
+                                    trapTypeSelect.appendChild(option);
+                                }
+                            });
+                        }
+                        const animalSexSelect = setForm.querySelector('[data-select="animalSex"]');
+                        if(animalSexSelect) {
+                            lookups.forEach(lookup => {
+                                if(lookup.key === "Sex") {
+                                    const option = document.createElement('option');
+                                    option.innerHTML = lookup.value;
+                                    option.value = lookup.value;
+                                    animalSexSelect.appendChild(option);
+                                }
+                            });
+                        }
+                        const animalAgeSelect = setForm.querySelector('[data-select="animalAge"]');
+                        if(animalAgeSelect) {
+                            lookups.forEach(lookup => {
+                                if(lookup.key === "Age") {
+                                    const option = document.createElement('option');
+                                    option.innerHTML = lookup.value;
+                                    option.value = lookup.value;
+                                    animalAgeSelect.appendChild(option);
+                                }
+                            });
+                        }
+                    }
+                    if(checkForm) {
+                        const trapTypeSelect = checkForm.querySelector('[data-select="trapType"]');
+                        if(trapTypeSelect) {
+                            lookups.forEach(lookup => {
+                                if(lookup.key === "TrapType") {
+                                    const option = document.createElement('option');
+                                    option.innerHTML = lookup.value;
+                                    option.value = lookup.value;
+                                    trapTypeSelect.appendChild(option);
+                                }
+                            });
+                        }
+                        const animalSexSelect = checkForm.querySelector('[data-select="animalSex"]');
+                        if(animalSexSelect) {
+                            lookups.forEach(lookup => {
+                                if(lookup.key === "Sex") {
+                                    const option = document.createElement('option');
+                                    option.innerHTML = lookup.value;
+                                    option.value = lookup.value;
+                                    animalSexSelect.appendChild(option);
+                                }
+                            });
+                        }
+                        const animalAgeSelect = checkForm.querySelector('[data-select="animalAge"]');
+                        if(animalAgeSelect) {
+                            lookups.forEach(lookup => {
+                                if(lookup.key === "Age") {
+                                    const option = document.createElement('option');
+                                    option.innerHTML = lookup.value;
+                                    option.value = lookup.value;
+                                    animalAgeSelect.appendChild(option);
+                                }
+                            });
+                        }
+                    }
+                }
+                if(animalCategories.length > 0) {
+                        const animalSelects = this.shadowRoot.querySelectorAll('[data-select="animalCaught"]');
+                        animalSelects.forEach(animalSelect => {
+                            animalCategories.forEach(animalCategorie => {
+                                const option = document.createElement('option');
+                                option.innerHTML = animalCategorie.name;
+                                option.value = animalCategorie.id;
+                                animalSelect.appendChild(option);
+                            });
+                        });
+                }
+            }
+            animalCaughtChanged(event, formElement) {
+                const animalCategorie = animalCategories.find(categorie => categorie.id === event.target.value);
+                if(animalCategorie) {
+                    const animalAgeSelect = formElement.querySelector('[data-select="animalAge"]');
+                    if(animalAgeSelect) {
+                        if(parseInt(animalCategorie.age)) {
+                            animalAgeSelect.parentNode.style.display = '';
+                        } else {
+                            animalAgeSelect.parentNode.style.display = 'none';
+                        }
+                    }
+                    
+                    const lureTypeSelect = formElement.querySelector('[data-info="lureType"]');
+                    if(lureTypeSelect) {
+                        if(parseInt(animalCategorie.captureMethod)) {
+                            lureTypeSelect.parentNode.parentNode.parentNode.style.display = '';
+                        } else {
+                            lureTypeSelect.parentNode.parentNode.parentNode.style.display = 'none';
+                        }
+                    }
+                    
+                    const animalSexSelect = formElement.querySelector('[data-select="animalSex"]');
+                    if(animalSexSelect) {
+                        if(parseInt(animalCategorie.sex)) {
+                            animalSexSelect.parentNode.style.display = '';
+                        } else {
+                            animalSexSelect.parentNode.style.display = 'none';                            
+                        }
+                    }
+                    
+                    const subSpeciesSelect = formElement.querySelector('[data-info="subSpecies"]');
+                    if(subSpeciesSelect) {
+                        if(parseInt(animalCategorie.subSpecies)) {
+                            subSpeciesSelect.parentNode.parentNode.parentNode.style.display = '';
+                        } else {
+                            subSpeciesSelect.parentNode.parentNode.parentNode.style.display = 'none';
+                        }
+                    }
+
+                    const catchNotes = formElement.querySelector('[data-info="catchNotes"]');
+                    if(catchNotes)
+                        catchNotes.parentNode.parentNode.parentNode.style.display = '';
+                } else {
+                    const animalAgeSelect = formElement.querySelector('[data-select="animalAge"]');
+                    if(animalAgeSelect) 
+                        animalAgeSelect.parentNode.style.display = 'none';
+                    
+                    const lureTypeSelect = formElement.querySelector('[data-info="lureType"]');
+                    if(lureTypeSelect) 
+                        lureTypeSelect.parentNode.parentNode.parentNode.style.display = 'none';
+                    
+                    const animalSexSelect = formElement.querySelector('[data-select="animalSex"]');
+                    if(animalSexSelect) 
+                        animalSexSelect.parentNode.style.display = 'none';
+                    
+                    const subSpeciesSelect = formElement.querySelector('[data-info="subSpecies"]');
+                    if(subSpeciesSelect) 
+                        subSpeciesSelect.parentNode.parentNode.parentNode.style.display = 'none';
+
+                    const catchNotes = formElement.querySelector('[data-info="catchNotes"]');
+                    if(catchNotes)
+                        catchNotes.parentNode.parentNode.parentNode.style.display = 'none';
+                }
+            }
+            isAnimalCaughtChanged(event, form) {
+                const animalSelect = form.querySelector('[data-select="animalCaught"]');
+                const catchNotes = form.querySelector('[data-info="catchNotes"]');
+                if(event.target.value === 'Yes') {
+                    animalSelect.parentNode.style.display = '';
+                } else {
+                    animalSelect.parentNode.style.display = 'none';
+                    catchNotes.parentNode.parentNode.parentNode.style.display = 'none';
+                }
+            }
+            submitSetForm() {
+                const id = this.shadowRoot.querySelector("div[data-id]").getAttribute("data-id");
+                const setForm = this.shadowRoot.querySelector("[data-section='formScreen'] [data-form='formSet']");
+                const user = fw.func("GETUSER");
+                const dbVal = {};
+                dbVal[id] = {
+                    "Id": id,
+                    "DeviceType": setForm.querySelector("[data-select='DeviceTypes']").value,
+                    "DeviceName": setForm.querySelector("[data-info='setName']").value,
+                    "Location": setForm.querySelector("[data-info='setLocation']").value,
+                    "StationId": setForm.querySelector("[data-info='stationInput']").value,
+                    "SetTime": new Date().getTime(),
+                    "Owner": user,
+                    "Status": CardStatus.Enabled,
+                    "State": CardState.NormalGreen,
+                };
+                // Update a record's values, Fails if the record does not exist.
+                Database.updateRecord("Rodent", "Devices", dbVal, function (data) {
+
+                });
+                fw.fireEvent("EventTransaction", { ID: id, EventType: 3, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: "", Value: "" });
+                this.cancelForm('formSet');
+                const actionsElement = this.shadowRoot.querySelector('[data-section="Actions"]');
+                const setActionElement = actionsElement.querySelector(`[data-info="SET"]`);
+                if(setActionElement)
+                    setActionElement.style.visibility = 'hidden';
+                const checkActionElement = actionsElement.querySelector(`[data-info="CHECK"]`);
+                if(checkActionElement)
+                    checkActionElement.style.visibility = '';
+            }
+            submitCheckForm() {
+                const id = this.shadowRoot.querySelector("div[data-id]").getAttribute("data-id");
+                fw.fireEvent("EventTransaction", { ID: id, EventType: 5, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: "", Value: "" });
+                const checkForm = this.shadowRoot.querySelector("[data-section='formScreen'] [data-form='formCheck']");
+                if(checkForm) {
+                    const inputFields = ['catchNotes'];
+                    const selectFields = ['animalCaught'];
+                    const data = {
+                        action: "CHECK",
+                        deviceId: id,
+                    };
+                    inputFields.forEach(field => {
+                        const fieldElement = checkForm.querySelector(`[data-info="${field}"]`);
+                        if(fieldElement)
+                            data[field] = fieldElement.value;
+                    });
+                    selectFields.forEach(field => {
+                        const fieldElement = checkForm.querySelector(`[data-select="${field}"]`);
+                        if(fieldElement)
+                            data[field] = fieldElement.value === "default" ? "" : fieldElement.value;
+                    });
+                    if(data.animalCaught)
+                        fw.func("PUBLISHCLIENT", "addCapture", data);
+                }
+                this.cancelForm('formCheck');
+            }
+            submitClearForm() {
+                const id = this.shadowRoot.querySelector("div[data-id]").getAttribute("data-id");
+                fw.fireEvent("EventTransaction", { ID: id, EventType: 6, CreatedOn: new Date().getTime(), CreatedBy: fw.func("GETUSER"), Owner: fw.func("GETUSER"), CompanyProductId: "", Value: "" });
+                const checkForm = this.shadowRoot.querySelector("[data-section='formScreen'] [data-form='formClear']");
+                if(checkForm) {
+                    const inputFields = ['catchNotes'];
+                    const selectFields = ['animalCaught'];
+                    const data = {
+                        action: "CLEAR",
+                        deviceId: id,
+                    };
+                    inputFields.forEach(field => {
+                        const fieldElement = checkForm.querySelector(`[data-info="${field}"]`);
+                        if(fieldElement)
+                            data[field] = fieldElement.value;
+                    });
+                    selectFields.forEach(field => {
+                        const fieldElement = checkForm.querySelector(`[data-select="${field}"]`);
+                        if(fieldElement)
+                            data[field] = fieldElement.value === "default" ? "" : fieldElement.value;
+                    });
+                    if(data.animalCaught)
+                        fw.func("PUBLISHCLIENT", "addCapture", data);
+                }
+                this.cancelForm('formClear');
+            }
+        }
+        customElements.define('snap-trap', SnapTrap);
     </script>
 </body>
 

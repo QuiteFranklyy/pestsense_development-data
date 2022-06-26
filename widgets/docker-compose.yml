@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  sensahub:
+    image: sensahub:5.0
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    user: $UID:$GUID
+    working_dir: $HOME/pestsense/
+    command: --data-directory $HOME/pestsense/
+    cap_add:
+      - CAP_NET_BIND_SERVICE
+    deploy:
+      restart_policy:
+        condition: on-failure
+    ports:
+    - "80:80"
+    - "443:443"
+    - "1883:1883"
+    - "8883:8883"
+    - "21:21"
+    - "20220:20220"
+    volumes:
+      - ./etc/demo-data/:$HOME/pestsense
+      - ./etc/demo-data/wlabel:/opt/sensahub/wwwroot/wlabel
+      - ./etc/demo-data/settings:/opt/sensahub/settings
+      - ./etc/demo-data/userfiles/:/opt/sensahub/wwwroot/userfiles
+      # comment out the following line if you only want to use default Sensahub help
+      - ./etc/demo-data/widgets/help:/opt/sensahub/wwwroot/help
+      - ./etc/demo-data/widgets/js/settings:/opt/sensahub/wwwroot/js/settings
+      - ./etc/demo-data/widgets/js/pestsense_scripts:/opt/sensahub/wwwroot/js/pestsense_scripts
+      - '/etc/group:/etc/group:ro'
+      - '/etc/passwd:/etc/passwd:ro'
+      - '/etc/shadow:/etc/shadow:ro'
+    environment:
+    - TZ=Australia/Brisbane

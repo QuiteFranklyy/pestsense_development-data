@@ -68,6 +68,9 @@ var widgetContainer = document.getElementById("widgetContainer");
 var sidebarDiv = document.getElementById("sidebar");
 var sidebarListDiv = document.getElementById("sidebarList");
 var canvasSectionDiv = document.getElementById("widgetSection");
+const navBar = window.parent.document.getElementById("navBar");
+const footer = window.parent.document.querySelector("status-bar");
+const iFrameDiv = window.parent.document.getElementById("iFrameDiv");
 
 //TODO: Remove when the code using this is moved to CSS
 var minButton = document.getElementById("minButton");
@@ -202,6 +205,8 @@ function importCodemirrorDeps(title) {
         lint: { esversion: 10 }
     });
     editor.setSize("100%", "100%");
+    // Prevent scripting code loss
+    editor.on("change", () => {g.dirty = true;});
     editor.refresh();
 
     /*
@@ -479,7 +484,7 @@ function initScreens(screensIni) {
 
     } else {                // No screens from server - new setup, so handle welcome messages
 
-        if (!g.design) {
+        if (parent.g.mode === "Dashboard") {
             // First time running, won't be in design, so if user has design privs switch them to design
             if (parent.sess.permissions.indexOf("design") !== -1) {
                 if (parent.window.screen.width < 1025) {
@@ -499,7 +504,7 @@ function initScreens(screensIni) {
                 return;
             }
         } else {
-            if (g.flowEditor) {
+            if (parent.g.mode == "Flows") {
                 parent.alertModal("No flows have been configured yet. <br><br>To get started, rename the 'New Flow' tab on the left, "
                     + "select a new tab icon and use the Design Options icons on the bottom left corner to create or delete screens, save or use the widget toolbox to drag and add flow widgets. "
                     + "<br > <br>Select the 'Help' option on the 'More' menu in the top navigation bar for more help.", "Setup Flows",
@@ -1528,7 +1533,14 @@ async function afterRender(widgetName) {
 
     // Show dashboard!
     document.getElementById("widgetContainer").style.setProperty("visibility", "visible");
+    minButton.style.opacity = 1;
+    sidebarDiv.style.opacity = 1;
     sidebarListDiv.style.opacity = 1;
+
+    if (g.design || g.flowEdit) {
+        document.getElementById("widgetSection").classList.add("grid-paper");
+    }
+
 }
 
 /**
@@ -1838,7 +1850,8 @@ function keyDown(e) {
                 parent.confirmModal("Confirm that you want to copy screen '" + selScreenName + "'?", "Copy " + (g.flowEditor ? "Node" : "Widget") + " Screen", { confirmText: "Copy" })
                     .then((res) => {
                         if (res) {
-                            selectedTab(selScreeName)
+                            copyScreen();
+                            selectedTab(selScreenName)
                         }
                     });
             }
@@ -2480,10 +2493,6 @@ function EventBroker() {                // Constructor
                                         var dataClone = JSON.parse(JSON.stringify(event.data));
                                         dataClone.sysmeta.channel = eventChannelKey;
 
-                                        if (typeof widgets[client].defView.options === "undefined") {
-                                            debugger;
-                                        }
-
                                         widgets[client].defView.options.serverEvents.inputEvents[sourceFunc[1]].function(eventChannelKey, client, dataClone);
                                         Log.info("Server message sent to subscribing widget '" + client + "' (" + widgets[client].type + ") with channel '" + eventChannelKey + "', sysmeta '" + event.data.sysmeta.source + "' usrmeta '" + event.data.usrmeta + "' data '" + event.data.value + "'");
 
@@ -2494,10 +2503,6 @@ function EventBroker() {                // Constructor
                                         var dataClone = JSON.parse(JSON.stringify(event.data));
                                         dataClone.sysmeta.channel = eventChannelKey;
 
-                                        if (typeof widgets[client].defView.options === "undefined") {
-                                            debugger;
-                                        }
-                                        
                                         // the event needs to be the same name as the client widget is expecting. Even though it is a feed event, it may be called a different name, ie radial has "inner circle" and "outer circle"
                                         widgets[client].defView.options.serverEvents.inputEvents[evtFunction].function(eventChannelKey, client, dataClone);
                                         Log.info("Server message sent to subscribing widget '" + client + "' (" + widgets[client].type + ") with channel '" + eventChannelKey + "', sysmeta '" + event.data.sysmeta.source + "' usrmeta '" + event.data.usrmeta + "' data '" + event.data.value + "'");
@@ -2819,7 +2824,8 @@ function fireEvent(widgetName, outEventName, data) {
                     var packet = {
                         value: data,
                         sysmeta: {
-                            label: plabel
+                            label: plabel,
+                            source: `WIDGET/${widgetName}`
                         }
                     };
 
@@ -3127,6 +3133,35 @@ function widgetRequest(widgetName, func, param0, param1, param2, param3, param4,
             }
             break;
 
+        case "NATIVEFULLSCREENMODE":
+            if (iFrameDiv.requestFullscreen)
+            iFrameDiv.requestFullscreen();
+            else if (iFrameDiv.msRequestFullscreen)
+            iFrameDiv.msRequestFullscreen();
+            else if (iFrameDiv.mozRequestFullScreen)
+            iFrameDiv.mozRequestFullScreen();
+            else if (iFrameDiv.webkitRequestFullscreen)
+            iFrameDiv.webkitRequestFullscreen();
+            break;
+
+        case "FULLSCREENMODE":
+            if(navBar) navBar.style.display = "none";
+            if(footer) footer.style.display = "none";
+            if(iFrameDiv) {
+                iFrameDiv.style.top = "0";
+                iFrameDiv.style.bottom = "0";
+            }
+            break; 
+
+        case "ESCFULLSCREENMODE":
+            if(navBar) navBar.style.display = "";
+            if(footer) footer.style.display = "";
+            if(iFrameDiv) {
+                iFrameDiv.style.top = "57px";
+                iFrameDiv.style.bottom = "38px";
+            }
+            break; 
+
         case "CLEARSTATESTORE":
             globalsStateStore.clearStateStore();
             return true;
@@ -3170,6 +3205,24 @@ function widgetRequest(widgetName, func, param0, param1, param2, param3, param4,
 
         case "GETWIDGETS":
             return widgets;
+            break;
+
+        case "SETDISABLEWIDGET":
+            if (param0 && param1 !== undefined) {
+                document.getElementById(param0).disabled = param1;
+            }
+            break;
+
+        case "HIDEWIDGET":
+            if (param0) {
+                document.getElementById(param0).style.setProperty("display", "none");
+            }
+            break;
+
+        case "SHOWWIDGET":
+            if (param0) {
+                document.getElementById(param0).style.setProperty("display", "inline");
+            }
             break;
 
         case "CHECKSYSPRIVS":
@@ -3457,11 +3510,21 @@ function widgetRequest(widgetName, func, param0, param1, param2, param3, param4,
                     }
                     break;
                 case "TOPOFFSET":
-                    widgetObj.style.setProperty("top", (parseInt(widgetObj.style.getPropertyValue("top")) + parseInt(param1)) + "px");
+                    let currentTop = widgetObj.style.getPropertyValue("top");
+                    if (currentTop.indexOf("calc") !== -1) {
+                        // CSS is using calc, need to extract value
+                        currentTop = currentTop.replace("calc(", "").replace(")", "");
+                    }
+                    widgetObj.style.setProperty("top", (parseInt(currentTop) + parseInt(param1)) + "px");
                     widgets[widgetName].locY = parseInt(widgetObj.style.getPropertyValue("top"));
                     break;
                 case "LEFTOFFSET":
-                    widgetObj.style.setProperty("left", (parseInt(widgetObj.style.getPropertyValue("left")) + parseInt(param1)) + "px");
+                    let currentLeft = widgetObj.style.getPropertyValue("left");
+                    if (currentLeft.indexOf("calc") !== -1) {
+                        // CSS is using calc, need to extract value
+                        currentLeft = currentLeft.replace("calc(", "").replace(")", "");
+                    }
+                    widgetObj.style.setProperty("left", (parseInt(currentLeft) + parseInt(param1)) + "px");
                     widgets[widgetName].locX = parseInt(widgetObj.style.getPropertyValue("left"));
                     break;
                 case "SCALEX":
@@ -3967,6 +4030,7 @@ class widgetAPI {
         let win = document.getElementById(widgetName).contentWindow;
         win["Log"] = new Logger(`WIDGETS/${widgetName}`);
         win["SensaCollection"] = SensaCollection;
+        win["console"] = win["Log"];
 
         if (widgetName.indexOf("TB#") !== -1) {
             this.state = "TOOLBOX";
@@ -3988,12 +4052,17 @@ class widgetAPI {
             return widgets[this.widgetName].attribs[attrib];
         } else {
             // DefView may have been deleted due to jumpToScreen script so defView needs to be checked
-            if (typeof widgets[this.widgetName].defView == "undefined") {
-                // Add defview back in.
-                widgets[this.widgetName].defView = document.getElementById(this.widgetName).contentDocument.defaultView;
-            }
-            if (attrib in widgets[this.widgetName].defView.options.attribs) {
-                return widgets[this.widgetName].defView.options.attribs[attrib].default;
+            // Only make this check if the widget actually belongs on this screen
+            if (this.screenName == selScreenName) {
+                if (typeof widgets[this.widgetName].defView == "undefined") {
+                    // Add defview back in.
+                    widgets[this.widgetName].defView = document.getElementById(this.widgetName).contentDocument.defaultView;
+                }
+                if (attrib in widgets[this.widgetName].defView.options.attribs) {
+                    return widgets[this.widgetName].defView.options.attribs[attrib].default;
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }

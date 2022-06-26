@@ -1034,6 +1034,9 @@
                 }
                 var children = Array.from(children).concat(Array.from(grandChildrenNodes));
 
+                if(showActive)
+                    children = children.filter(element => element.getAttribute('data-status') !== '0');
+
                 for (var i = 0; i < children.length; i++) {
                     if (eventData.value.length === 0) {
                         // Blank query, display result
@@ -1401,6 +1404,11 @@
         }
         function genericChildProfileClicked(event) {
             event.stopPropagation();
+            if(event.target.getAttribute('alt') === 'locationIcon') {
+                event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.onclick();
+                event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.onclick();
+                return;
+            }
             bypass = true;
             const id = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("data-id");
             genericChildClicked(id);
@@ -1898,8 +1906,10 @@
                 }).length === 1) {
                     const locationIcon = rowElems[activeCards[1]].querySelector('img[alt="locationIcon"]');
                     if(locationIcon) {
-                        rowElems[activeCards[1]].firstElementChild.onclick();
-                        rowElems[activeCards[1]].firstElementChild.onclick();  
+                        setTimeout(()=>{
+                            rowElems[activeCards[1]].firstElementChild.onclick();
+                            rowElems[activeCards[1]].firstElementChild.onclick(); 
+                        },400)
                         bypass = false;                      
                     } else {
                         rowElems[activeCards[1]].firstElementChild.onclick();

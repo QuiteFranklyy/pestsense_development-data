@@ -406,7 +406,7 @@
             if (source.length > 0) {
                 // icons were in fact added
                 // create an input field to manually override the next icon number
-                draggableGrid.appendChild(getInputIcon("numberInput", "number", "40px", () => iconCounters = +document.getElementById("numberInput").value, iconCounters));
+                draggableGrid.appendChild(getInputIcon("numberInput", "", "60px", () => iconCounters = +document.getElementById("numberInput").value, iconCounters));
                 // create an delete icon to remove items from map
                 let bin = document.createElement('div');
                 bin.innerHTML = `<svg id="deleteMapItemsBin" version="1.0" xmlns="http://www.w3.org/2000/svg" onclick="deleteMapItems(this)" width="32" height="32" viewBox="0 0 24.000000 24.000000" preserveAspectRatio="xMidYMid meet" style="visibility: inherit; margin-left: 1rem; cursor: pointer;">
@@ -453,7 +453,7 @@
             inputIcon.type = type;
             inputIcon.value = defaultValue;
             inputIcon.onchange = onChangeCallback;
-            inputIcon.setAttribute("style", `height: 30px; width: ${width}; font-size: 15px`);
+            inputIcon.setAttribute("style", `height: 48px; width: ${width}; font-size: 24px`);
             
             var tempDiv = document.createElement("div");
             tempDiv.setAttribute("style", "display: flex; flex-direction: column; justify-content: center;");
@@ -619,6 +619,7 @@
                 addingElement.getElementsByClassName("textContainer")[0].innerHTML = document.getElementById("labelInput").value;
                 addingElementObj.style.setProperty("width", "10vw");
                 addingElementObj.style.setProperty("position", "absolute");
+                addingElementObj.style.setProperty("max-width", "60px");
             } else {
                 addingElement.getElementsByClassName("textContainer")[0].innerHTML = iconCounters++;
                 document.getElementById("numberInput").value = iconCounters;
@@ -838,6 +839,7 @@
                         addingElementObj = template.getElementsByClassName("colorContainer")[0];
                         template.getElementsByClassName("textContainer")[0].innerHTML = current.label;
                         addingElementObj.style.setProperty("width", "10vw");
+                        addingElementObj.style.setProperty("max-width", "60px");
                         addingElementObj.style.setProperty("position", "absolute");
                         if(current.state) {
                             addingElementObj.style.setProperty("max-width", "30px");

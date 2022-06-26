@@ -150,6 +150,9 @@
         var editMapValue = 0;
         var searchType = 'Cards';
         var searchQuery = '';
+        var activeMode = 'Active';
+        var sortType = 'Sort By Status';
+        var pageName = '';
 
         /**
         * Handles a generic action, routes it back to the controller action handler for functional implementation
@@ -223,7 +226,7 @@
                     }
                     break;
                 case "setVal":
-
+                    pageName = packet.value.Value;
                     var getElm = document.getElementById("PageName");
                     if (getElm !== null) {
                         getElm.innerHTML = packet.value.Value;
@@ -370,6 +373,7 @@
             }
         }
         function ChangeActiveMode(eventData) {
+            activeMode = eventData.value;
             if (eventData.value === "All") {
                 handleGeneric(`FilterFor|All`);
             } else if (eventData.value === "Omit No Activity") {
@@ -379,6 +383,7 @@
             }
         }
         function ChangeSort(eventData) {
+            sortType = eventData.value;
             if (eventData.value === "Sort By Station Id") {
                 fw.func("PUBLISHCLIENT", "SortBy", {
                     value: ["StationId", "true"]
@@ -434,13 +439,13 @@
         function openFloorMap(event) {
             event.stopPropagation();
             fw.func("PUBLISHCLIENT", "mapFullScreen", {});
-            fw.func("TOGGLESIDEBAR", true);
+            fw.func("FULLSCREENMODE", "");
             fw.func("PUBLISHCLIENT", "openPhoneMap", {});
             toggleFullScreen(window.top.document.body);
         }
 
         function openSidebar() {
-            fw.func("TOGGLESIDEBAR", false);
+            fw.func("ESCFULLSCREENMODE", "");
             toggleFullScreen(window.top.document.body);
         }
 
@@ -458,15 +463,14 @@
                 }
                 //floorMapUploadBtn.style.visibility = 'visible';
                 fw.func("HIDEWIDGET", "PickSlider#0");
-                fw.func("HIDEWIDGET", "Label#40");
                 fw.func("HIDEWIDGET", "Graph#0");
                 fw.func("HIDEWIDGET", "Graph#2");
                 fw.func("HIDEWIDGET", "Graph#3");
                 fw.func("HIDEWIDGET", "Graph#1");
-                fw.func("HIDEWIDGET", "Graph#4");
                 fw.func("HIDEWIDGET", "Graph#5");
-                fw.func("HIDEWIDGET", "Graph#6");
                 fw.func("SHOWWIDGET", "DeviceLevelFoorMap");
+                fw.func("HIDEWIDGET", "toggleTimeWindowFilter");
+                fw.func("HIDEWIDGET", "toggleTimeWindowFilterLabel");
             }
             else {
                 eventData.querySelector('[data-value="floorPlanCheckbox"]').checked = false;
@@ -474,16 +478,15 @@
                 toggle.setAttribute("class", "inactiveToggle");
                 floorMapUploadBtn.style.visibility = 'hidden';
                 fw.func("SHOWWIDGET", "PickSlider#0");
-                fw.func("SHOWWIDGET", "Label#40");
                 fw.func("SHOWWIDGET", "Graph#0");
                 fw.func("SHOWWIDGET", "Graph#2");
                 fw.func("SHOWWIDGET", "Graph#3");
                 fw.func("SHOWWIDGET", "Graph#1");
-                fw.func("SHOWWIDGET", "Graph#4");
                 fw.func("SHOWWIDGET", "Graph#5");
-                fw.func("SHOWWIDGET", "Graph#6");
                 fw.func("HIDEWIDGET", "DeviceLevelFoorMap");
                 fw.func("HIDEWIDGET", "SaveFloorMap");
+                fw.func("SHOWWIDGET", "toggleTimeWindowFilter");
+                fw.func("SHOWWIDGET", "toggleTimeWindowFilterLabel");
             }
         }
 
@@ -497,7 +500,6 @@
         }
 
         function toggleSearchBar(eventData) {
-            console.log(eventData);
             // eventData.getElementsByClassName("bi-funnel-fill")[0].style.setProperty("display","");
 
             let filledFunnel = eventData.getElementsByClassName("bi-funnel-fill")[0];
@@ -505,19 +507,32 @@
             let searchBar = document.getElementById("filterSearchInputContainer");
             let filterContainer = document.getElementById("filterContainer");
             let pageName = document.getElementById('PageName');
-            let filterSaveCheckbox = document.getElementById('filterSaveCheckbox');
+            let filterSaveButton = document.getElementById('filterSaveButton');
+            let filterSaveText = document.getElementById('filterSaveText');
+            const filterResults = document.getElementById('filterResults');
 
             filledFunnel.style.display = (window.getComputedStyle(filledFunnel).display === "none") ? "" : "none";
             funnel.style.display = (window.getComputedStyle(funnel).display === "none") ? "" : "none";
+            if(filterResults) filterResults.style.display = (window.getComputedStyle(filledFunnel).display === "none") && "none";
             searchBar.style.display = (window.getComputedStyle(searchBar).display === "none") ? "" : "none";
             filterContainer.style.display = (window.getComputedStyle(filterContainer).display === "none") ? "" : "none";
             pageName.style.display = (window.getComputedStyle(pageName).display === "none") ? "" : "none";
-            filterSaveCheckbox.style.display = (window.getComputedStyle(filterSaveCheckbox).display === "none") ? "" : "none";
+            if(filterSaveButton) filterSaveButton.style.display = (window.getComputedStyle(filterSaveButton).display === "none") ? "" : "none";
+            if(filterSaveText) filterSaveText.style.display = (window.getComputedStyle(filterSaveText).display === "none") ? "" : "none";
 
-            fw.func("ADJUSTSIZE", "HEIGHT", (window.getComputedStyle(searchBar).display === "none") ? 75 : 320);
+            fw.func("ADJUSTSIZE", "HEIGHT", (window.getComputedStyle(searchBar).display === "none") ? 75 : 145);
             handleGeneric(`AdjustSize|${(window.getComputedStyle(searchBar).display === "none") ? '-45px' : '45px'}`)
-            document.getElementById("navContainer").style.setProperty("height", (window.getComputedStyle(searchBar).display === "none" ? "68%" : "15%"));
-            fw.func("PUBLISHCLIENT", "loadDefaultFilter", true);
+            window.getComputedStyle(funnel).display === "none" && fw.func("PUBLISHCLIENT", "loadDefaultFilter", true);
+
+            searchBar.addEventListener("keypress", function(event) {
+                // If the user presses the "Enter" key on the keyboard
+                if (event.key === "Enter") {
+                    // Cancel the default action, if needed
+                    event.preventDefault();
+                    // Trigger the button element with a click
+                    handleSearch();
+                }
+            })
         }
 
         function handleSearchSelect(event) {
@@ -526,11 +541,20 @@
 
         function handleSearchInput() {
             searchQuery = document.getElementById("filterSearchInput").value;
-            if (searchQuery) {
-                document.getElementById('searchIcon').style.display = '';
+            const searchIcon =  document.getElementById('searchIcon');
+            if(searchIcon) {
+                if (searchQuery) {
+                    searchIcon.style.display = '';
+                } else {
+                    searchIcon.style.display = 'none';
+                    document.getElementById('filterResults').style.display = 'none';
+                    fw.func("ADJUSTSIZE", "HEIGHT", 145);
+                }
             } else {
-                document.getElementById('searchIcon').style.display = 'none';
+                handleGeneric(`SearchFor|${searchQuery}`);
             }
+            if(!searchQuery)
+                handleGeneric(`SearchFor|${searchQuery}|Cards`);
         }
 
         function handleClearSearch() {
@@ -539,7 +563,11 @@
         }
 
         function handleSearch() {
-            handleGeneric(`SearchFor|${searchQuery}|${searchType}`);
+            if(searchType === 'Cards') {
+                document.getElementById('filterResults').style.display = 'none';
+                fw.func("ADJUSTSIZE", "HEIGHT", 145);
+            }
+            handleGeneric(`SearchFor|${searchQuery}|${searchType}|${activeMode}`);
         }
 
         function loadSearchItems(eventData) {
@@ -548,12 +576,14 @@
             eventData.value.slice(0, 10).forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('filterResult');
-                itemDiv.classList.add('col-5');
                 itemDiv.innerHTML = item.name;
                 itemDiv.setAttribute('onclick', `loadSearchItem(event, ${item.id})`);
                 container.append(itemDiv);
             });
-            container.style.display = '';
+            if(eventData.value.length > 0) {
+                container.style.display = '';
+                fw.func("ADJUSTSIZE", "HEIGHT", 320);
+            }
         }
 
         function loadSearchItem(event, id) {
@@ -562,40 +592,23 @@
             document.querySelector('.bi.bi-funnel-fill').parentNode.onclick();
         }
 
-        function filterSaveCheckboxChange(event) {
-            event.stopImmediatePropagation();
-            if (event.target.checked) {
-                document.getElementById('filterSaveButton').style.display = '';
-            } else {
-                document.getElementById('filterSaveButton').style.display = 'none';
-            }
-        }
-
         function saveFilter() {
-            fw.func("PUBLISHCLIENT", "levelPersistenceFilterUpdate", {
-                searchType,
-                searchQuery,
-                activeMode: document.getElementById('filterSelect')?.value,
+            fw.func("PUBLISHCLIENT", "deviceLevelPersistenceFilterUpdate", {
+                sortType,
+                activeMode,
             });
             document.querySelector('.bi.bi-funnel-fill').parentNode.onclick();
+            document.getElementById('filterSaveButton').style.display = 'none';
         }
 
         function setFilters(eventData) {
             const filterSelect = document.getElementById('filterSelect');
             if (filterSelect) filterSelect.value = eventData.value.activeMode;
-            const searchSelect = document.getElementById('searchSelect');
-            if (searchSelect) {
-                searchSelect.value = eventData.value.searchType;
-                searchType = eventData.value.searchType;
-            }
-            const filterSearchInput = document.getElementById('filterSearchInput');
-            if (filterSearchInput) {
-                filterSearchInput.value = eventData.value.searchQuery;
-                searchQuery = eventData.value.searchQuery;
-            }
+            if (filterSelect) filterSelect.onchange(filterSelect);
             const filterSort = document.getElementById('filterSort');
             if (filterSort) filterSort.value = eventData.value.sortType;
-            handleSearch();
+            if (filterSort) filterSort.onchange(filterSort);
+            // handleSearch();
         }
 
         function SetToggleActive(element, value) {
@@ -631,6 +644,14 @@
             document.getElementById("widget").innerHTML = "";
 
             document.getElementById("widget").append(packet.value);
+            if(pageName) {
+                setAction({
+                    value: {
+                        Action: 'setVal',
+                        Value: pageName
+                    }
+                });
+            }
         }
 
         /**

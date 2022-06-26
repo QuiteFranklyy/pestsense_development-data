@@ -101,12 +101,14 @@ Script.import = function (src, id, callback) {
  * @param {SensaCollection} collection - Collection to download in .csv format.
  */
 Script.downloadCSV = function (fileName, collection) {
-
+    
     if (!(collection instanceof SensaCollection)) {
+       
         throw new TypeError("Invalid sensacollection structure.");
     }
 
     if (typeof fileName !== "string") {
+      
         throw new TypeError("Invalid fileName type, expected 'string' but found '" + typeof fileName + "'.");
     }
 
